@@ -15,13 +15,16 @@ public class LSDLevel extends LSDContainer{
 	  public LSDSprite player;
 	  
 	  public final int BRIGHTNESS = 128;
-	  LSDLevel(){
+	  
+	LSDLevel(){
 	    super(LSDG.theParent.width/2,LSDG.theParent.height/2);
 	    this.w = LSDG.theParent.width;
 	    this.h = LSDG.theParent.height;
 	    
 	    collisionMap = new int[w][h];
 	    layers = new ArrayList<PImage>();
+	    
+	    
 	  }
 	  LSDLevel(int wi, int he){
 	    super(wi/2,he/2);
