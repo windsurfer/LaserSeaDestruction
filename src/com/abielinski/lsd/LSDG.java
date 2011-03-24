@@ -19,17 +19,17 @@ public class LSDG{
 	  public static HashMap<String, ArrayList<PImage>> cachedFrames= 
 		  new HashMap<String, ArrayList<PImage>>();;
 	  
-	  LSDG(){
+	  public LSDG(){
 		  LSDG.init();
 	  }
 	  
-	  LSDG(LSDGame _game){
-		  LSDG.game = _game;
+	  public LSDG(PApplet _theParent){
+		  LSDG.setApplet(_theParent);
 		  LSDG.init();
 	  }
 	  
 	  static public void setApplet(PApplet _theParent){
-		  theParent = _theParent;
+		  LSDG.theParent = _theParent;
 	  }
 	  
 	  static public void init(){
@@ -37,7 +37,7 @@ public class LSDG{
 	    currentFrameTime = 0;
 	    keys = new HashMap<Object, Boolean>();
 	    cachedFrames = new HashMap<String, ArrayList<PImage>>();
-	    game.init();
+	    //game.init();
 	  }
 	  
 	  public static void update(){
