@@ -16,7 +16,7 @@ public class LSDLevel extends LSDContainer{
 	  
 	  public final int BRIGHTNESS = 128;
 	  
-	LSDLevel(){
+	  public LSDLevel(){
 	    super(LSDG.theParent.width/2,LSDG.theParent.height/2);
 	    this.w = LSDG.theParent.width;
 	    this.h = LSDG.theParent.height;
@@ -26,7 +26,7 @@ public class LSDLevel extends LSDContainer{
 	    
 	    
 	  }
-	  LSDLevel(int wi, int he){
+	  public LSDLevel(int wi, int he){
 	    super(wi/2,he/2);
 	    this.w = wi;
 	    this.h = he;

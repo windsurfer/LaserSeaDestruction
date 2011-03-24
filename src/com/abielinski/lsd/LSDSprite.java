@@ -67,8 +67,10 @@ public class LSDSprite {
 			frames = new ArrayList<PImage>();
 			PImage img;
 			img = LSDG.loadImage(src);
-			for (int i = 0; i< img.width; i+=w) {
-				frames.add(img.get(i, 0,w,h));
+			for (int i = 0; i< img.height; i+=h) {
+				for (int j = 0; j < img.width; j+=w){
+					frames.add(img.get(i, j,w,h));
+				}
 			}
 		}
 	}
@@ -206,4 +208,10 @@ public class LSDSprite {
 		vel = Evn.get();
 		
 	}
+	
+	public void getScreenXY(PVector p){
+		p.x = 0;
+		p.y = 0;
+	}
+	
 }

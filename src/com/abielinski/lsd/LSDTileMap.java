@@ -3,7 +3,9 @@ package com.abielinski.lsd;
 
 import java.util.ArrayList;
 
+import processing.core.PApplet;
 import processing.core.PImage;
+import processing.core.PVector;
 
 import com.abielinski.lsd.util.*;
 
@@ -51,6 +53,8 @@ public class LSDTileMap extends LSDSprite {
 	public ArrayList<Integer>	_data;
 	public ArrayList<Rectangle> _rects;
 	
+	public PImage 				_buffer;
+	
 	public LSDTileMap() {
 		super();
 		
@@ -70,8 +74,7 @@ public class LSDTileMap extends LSDSprite {
 		_block = new LSDSprite();
 	}
 	
-	public LSDTileMap loadMap(String MapData, PImage TileGraphic,
-			int TileWidth, int TileHeight) {
+	public LSDTileMap loadMap(String MapData) {
 		// Figure out the map dimensions based on the data string
 		int c;
 		String[] cols;
@@ -101,11 +104,11 @@ public class LSDTileMap extends LSDSprite {
 		}
 		
 		// Figure out the size of the tiles
-		_pixels = TileGraphic;
-		_tileWidth = TileWidth;
+		
+		_tileWidth = w;
 		if (_tileWidth == 0)
 			_tileWidth = _pixels.height;
-		_tileHeight = TileHeight;
+		_tileHeight = h;
 		if (_tileHeight == 0)
 			_tileHeight = _tileWidth;
 		_block.w = _tileWidth;
@@ -130,6 +133,9 @@ public class LSDTileMap extends LSDSprite {
 		
 		//generateBoundingTiles();
 		refreshHulls();
+		
+		_buffer = new PImage(w, h);
+		render();
 		
 		return this;
 	}
@@ -198,5 +204,70 @@ public class LSDTileMap extends LSDSprite {
 			rx %= _pixels.width;
 		}
 		_rects.set(Index, new Rectangle(rx,ry,_tileWidth,_tileHeight));
+	}
+	
+	protected void renderTilemap(){
+		//Bounding box display options
+		PImage tileBitmap;
+		
+		tileBitmap = _pixels;
+		
+		PVector _point = new PVector();
+		getScreenXY(_point);
+		PVector _flashPoint = new PVector();
+		_flashPoint.x = _point.x;
+		_flashPoint.y = _point.y;
+		
+		Rectangle _flashRect = new Rectangle();
+		
+		int tx = (int) Math.floor(-_flashPoint.x/_tileWidth);
+		int ty = (int) Math.floor(-_flashPoint.y/_tileHeight);
+		if(tx < 0) tx = 0;
+		if(tx > widthInTiles-_screenCols) tx = widthInTiles-_screenCols;
+		if(ty < 0) ty = 0;
+		if(ty > heightInTiles-_screenRows) ty = heightInTiles-_screenRows;
+		int ri = ty*widthInTiles+tx;
+		_flashPoint.x += tx*_tileWidth;
+		_flashPoint.y += ty*_tileHeight;
+		int opx = (int) _flashPoint.x;
+		int c;
+		int cri;
+		for(int r = 0; r < _screenRows; r++){
+			cri = ri;
+			for(c = 0; c < _screenCols; c++){
+				_flashRect = _rects.get(cri);
+				if(_flashRect != null){
+					LSDG.theParent.image(frames.get(cri), _flashRect.x, _flashRect.y);
+				}
+				_flashPoint.x += _tileWidth;
+			}
+			ri += widthInTiles;
+			_flashPoint.x = opx;
+			_flashPoint.y += _tileHeight;
+		}
+	}
+	
+	/**
+	 * Draws the tilemap.
+	 */
+	 public void render(){
+		renderTilemap();
+	}
+	 
+	 
+	 public  void run() {
+		super.run();
+	}
+	public void draw() {
+		LSDG.theParent.translate(pos.x,pos.y);
+		LSDG.theParent.imageMode(PApplet.CENTER);
+		if (frames != null){
+			if(flip){
+				LSDG.theParent.scale(-1.0f,1.0f);
+			}
+			LSDG.theParent.scale(this.scale, this.scale);
+			render();
+		}
+		
 	}
 }
