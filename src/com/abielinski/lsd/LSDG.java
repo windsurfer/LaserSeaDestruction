@@ -137,8 +137,8 @@ public class LSDG{
 	      return null;
 	    }
 	    PVector[] area = sprite.collideArea();
-	    int w = (int)(area[1].x - area[0].x);
-	    int h = (int)(area[1].y - area[0].y);
+	    //int w = (int)(area[1].x - area[0].x);
+	   // int h = (int)(area[1].y - area[0].y);
 	    ArrayList<PVector> points= new ArrayList<PVector>();;
 	    for (int i = (int)area[0].x; i<(int)area[1].x;i++){
 	      for (int j = (int)area[0].y ; j<(int)area[1].y;j++){
@@ -231,8 +231,8 @@ public class LSDG{
 	    laserEnd.sub(laserOrigin);
 	    PVector laserNorm = laserEnd.get();
 	    laserNorm.normalize();
-	    PVector testPoint = laserOrigin.get();
-	    int magnitude = (int) Math.ceil(laserEnd.mag());
+	    //PVector testPoint = laserOrigin.get();
+	    //int magnitude = (int) Math.ceil(laserEnd.mag());
 	    int i = 0;
 	    while(i<3000){ // this SHOULD exit at some point
 	      i++;

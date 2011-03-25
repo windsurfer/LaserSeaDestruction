@@ -38,15 +38,19 @@ public class LSDSprite {
 	public PImage img;
 	
 	public LSDSprite() {
-		init();
+		construct();
 	}
 	public LSDSprite(float xpos, float ypos) {
-		init();
+		construct();
 		pos.x = xpos;
 		pos.y = ypos;
 	}
 	
-	private void init() {
+	public void init(){
+		construct();
+	}
+	
+	private void construct() {
 		pos = new PVector();
 		prevPos = new PVector();
 		vel = new PVector();
@@ -83,12 +87,19 @@ public class LSDSprite {
 		}
 	}
 	public void addAnimation(String anim,float fRate,ArrayList<Integer> frames) {
+		if(frames == null || anim == null|| animations == null){
+			PApplet.println("Invalid arguments to addAnimation");
+		}
+		if (animations == null){
+			animations = new HashMap<String, LSDAnimation>();
+		}
 		LSDAnimation newAnimation = new LSDAnimation(fRate,frames);
+		
 		animations.put(anim, newAnimation);
 		if (curAnimation == null) {
 			setAnimation(anim);
 		}else{
-			System.out.print("Animation wasn't null,weird.\n");
+			PApplet.print("Animation wasn't null,weird.\n");
 		}
 	}
 	
@@ -98,7 +109,7 @@ public class LSDSprite {
 			
 			
 		}else{
-			System.out.print("That animation doesn't exist\n");
+			PApplet.print("That animation doesn't exist\n");
 		}
 	}
 	private int curFrame() {
@@ -130,16 +141,17 @@ public class LSDSprite {
 		}
 	}
 	public void draw() {
-		LSDG.theParent.translate(pos.x,pos.y);
-		LSDG.theParent.imageMode(PApplet.CENTER);
-		if (frames != null){
-			if(flip){
-				LSDG.theParent.scale(-1.0f,1.0f);
+		LSDG.theParent.pushMatrix();
+			LSDG.theParent.translate(pos.x,pos.y);
+			LSDG.theParent.imageMode(PApplet.CENTER);
+			if (frames != null){
+				if(flip){
+					LSDG.theParent.scale(-1.0f,1.0f);
+				}
+				LSDG.theParent.scale(this.scale, this.scale);
+				LSDG.theParent.image(frames.get(curFrame()), 0,0);
 			}
-			LSDG.theParent.scale(this.scale, this.scale);
-			LSDG.theParent.image(frames.get(curFrame()), 0,0);
-		}
-		
+		LSDG.theParent.popMatrix();
 	}
 	
 	

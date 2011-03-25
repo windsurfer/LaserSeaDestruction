@@ -7,7 +7,6 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
-import com.abielinski.lsd.util.*;
 
 public class LSDTileMap extends LSDSprite {
 	/*
@@ -53,7 +52,6 @@ public class LSDTileMap extends LSDSprite {
 	public ArrayList<Integer>	_data;
 	public int[]			 _frames;
 	
-	public PImage 				_buffer;
 	
 	public LSDTileMap() {
 		super();
@@ -134,8 +132,8 @@ public class LSDTileMap extends LSDSprite {
 		//generateBoundingTiles();
 		refreshHulls();
 		
-		_buffer = new PImage(w, h);
-		render();
+		//_buffer = new PImage(w, h);
+		//render();
 		
 		return this;
 	}
@@ -201,9 +199,7 @@ public class LSDTileMap extends LSDSprite {
 	
 	protected void renderTilemap(){
 		//Bounding box display options
-		PImage tileBitmap;
 		
-		tileBitmap = _pixels;
 		
 		PVector _point = new PVector();
 		getScreenXY(_point);
@@ -211,7 +207,6 @@ public class LSDTileMap extends LSDSprite {
 		_flashPoint.x = _point.x;
 		_flashPoint.y = _point.y;
 		
-		Rectangle _flashRect = new Rectangle();
 		
 		int tx = (int) Math.floor(-_flashPoint.x/_tileWidth);
 		int ty = (int) Math.floor(-_flashPoint.y/_tileHeight);

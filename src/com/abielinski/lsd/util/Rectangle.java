@@ -18,4 +18,7 @@ public class Rectangle {
 		width = w;
 		height = h;
 	}
+	public float area(){
+		return width*height;
+	}
 }
