@@ -51,7 +51,7 @@ public class LSDTileMap extends LSDSprite {
 	public PImage				_pixels;
 	public LSDSprite			_block;
 	public ArrayList<Integer>	_data;
-	public ArrayList<Rectangle> _rects;
+	public int[]			 _frames;
 	
 	public PImage 				_buffer;
 	
@@ -78,7 +78,7 @@ public class LSDTileMap extends LSDSprite {
 		// Figure out the map dimensions based on the data string
 		int c;
 		String[] cols;
-		String[] rows = MapData.split("\n");
+		String[] rows = LSDG.theParent.loadStrings(MapData);
 		heightInTiles = rows.length;
 		_data = new ArrayList<Integer>();
 		for (int r = 0; r < heightInTiles; r++){
@@ -117,7 +117,7 @@ public class LSDTileMap extends LSDSprite {
 		// Then go through and create the actual map
 		w = widthInTiles * _tileWidth;
 		h = heightInTiles * _tileHeight;
-		_rects = new ArrayList(totalTiles);
+		_frames = new int[totalTiles];
 		for (i = 0; i < totalTiles; i++){
 			updateTile(i);
 		}
@@ -193,17 +193,10 @@ public class LSDTileMap extends LSDSprite {
 	{
 		if(_data.get(Index) < drawIndex)
 		{
-			_rects.set(Index, null);
+			_frames[Index] =  0;
 			return;
 		}
-		int rx = (_data.get(Index)-startingIndex)*_tileWidth;
-		int ry = 0;
-		if(rx >= _pixels.width)
-		{
-			ry = (int)(rx/_pixels.width)*_tileHeight;
-			rx %= _pixels.width;
-		}
-		_rects.set(Index, new Rectangle(rx,ry,_tileWidth,_tileHeight));
+		_frames[Index] = _data.get(Index);
 	}
 	
 	protected void renderTilemap(){
@@ -235,11 +228,12 @@ public class LSDTileMap extends LSDSprite {
 		for(int r = 0; r < _screenRows; r++){
 			cri = ri;
 			for(c = 0; c < _screenCols; c++){
-				_flashRect = _rects.get(cri);
-				if(_flashRect != null){
-					LSDG.theParent.image(frames.get(cri), _flashRect.x, _flashRect.y);
+				int i = _frames[cri];
+				if(_flashPoint != null){
+					LSDG.theParent.image(frames.get(i), _flashPoint.x, _flashPoint.y);
 				}
 				_flashPoint.x += _tileWidth;
+				cri++;
 			}
 			ri += widthInTiles;
 			_flashPoint.x = opx;

@@ -7,7 +7,7 @@ public class LSDGame extends LSDContainer{
 	  public LSDSprite cam_target;
 	  public float cam_speed;
 	  
-	  LSDGame(){
+	  public LSDGame(){
 	    super();
 	  }  
 	  public void init(){

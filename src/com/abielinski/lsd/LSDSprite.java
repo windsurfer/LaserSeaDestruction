@@ -35,10 +35,12 @@ public class LSDSprite {
 	public LSDAnimation curAnimation;
 	public LSDAnimation newAnimation;
 	
-	LSDSprite() {
+	public PImage img;
+	
+	public LSDSprite() {
 		init();
 	}
-	LSDSprite(float xpos, float ypos) {
+	public LSDSprite(float xpos, float ypos) {
 		init();
 		pos.x = xpos;
 		pos.y = ypos;
@@ -65,11 +67,17 @@ public class LSDSprite {
 		frames = LSDG.getFrames(src);
 		if (frames == null){
 			frames = new ArrayList<PImage>();
-			PImage img;
+			
 			img = LSDG.loadImage(src);
-			for (int i = 0; i< img.height; i+=h) {
-				for (int j = 0; j < img.width; j+=w){
-					frames.add(img.get(i, j,w,h));
+			if (img == null){
+				PApplet.println("Couldn't load image. Problem? :D");
+				return;
+			}
+			for (int i = 0; i<= img.height-h; i+=h) {
+				for (int j = 0; j <= img.width-w; j+=w){
+					//PApplet.println("data:" + i+":"+  j+":"+ w+":"+ h);
+					PImage g = img.get(j, i,w,h);
+					frames.add(g);
 				}
 			}
 		}
