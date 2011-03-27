@@ -2,6 +2,7 @@ package com.abielinski.lsd;
 
 import java.util.ArrayList;
 
+import com.abielinski.lsd.util.LSDList;
 import com.abielinski.lsd.util.Rectangle;
 
 public class QuadTree extends Rectangle {
@@ -14,6 +15,12 @@ public class QuadTree extends Rectangle {
 	 */
 	static public final int B_LIST = 1;
 	
+	/*
+	* The granuality of the quad tree
+	*/
+	static public int quadTreeDivisions = 3;
+	
+	
 	/**
 	 * Whether this branch of the tree can be subdivided or not.
 	 */
@@ -23,10 +30,10 @@ public class QuadTree extends Rectangle {
 	 * These variables refer to the internal A and B linked lists,
 	 * which are used to store objects in the leaves.
 	 */
-	protected ArrayList _headA;
-	protected ArrayList _tailA;
-	protected ArrayList _headB;
-	protected ArrayList _tailB;
+	protected LSDList _headA;
+	protected LSDList _tailA;
+	protected LSDList _headB;
+	protected LSDList _tailB;
 
 	/**
 	 * These variables refer to the potential child quadrants for this node.
@@ -54,22 +61,21 @@ public class QuadTree extends Rectangle {
 	static protected float _or;
 	static protected float _ob;
 	static protected int _oa;
-	static protected Object _oc;
 	
 	/**
 	 * Instantiate a new Quad Tree node.
 	 * 
 	 * @param	X			The X-coordinate of the point in space.
 	 * @param	Y			The Y-coordinate of the point in space.
-	 * @param	Width		Desired width of this node.
-	 * @param	Height		Desired height of this node.
+	 * @param	Width		Desired w of this node.
+	 * @param	Height		Desired h of this node.
 	 * @param	Parent		The parent branch or node.  Pass null to create a root.
 	 */
 	public QuadTree(float X, float Y, float Width, float Height, QuadTree Parent)
 	{
 		super(X,Y,Width,Height);
-		_headA = _tailA = new ArrayList();
-		_headB = _tailB = new ArrayList();
+		_headA = _tailA = new LSDList();
+		_headB = _tailB = new LSDList();
 		
 		/* DEBUG draw a randomly colored rectangle indicating this quadrant (may induce seizures)
 		FlxSprite brush = new FlxSprite().createGraphic(Width,Height,0xffffffff*FlxU.random());
@@ -78,8 +84,8 @@ public class QuadTree extends Rectangle {
 		//Copy the parent's children (if there are any)
 		if(Parent != null)
 		{
-			ArrayList itr;
-			ArrayList ot;
+			LSDList itr;
+			LSDList ot;
 			if(Parent._headA.object != null)
 			{
 				itr = Parent._headA;
@@ -88,7 +94,7 @@ public class QuadTree extends Rectangle {
 					if(_tailA.object != null)
 					{
 						ot = _tailA;
-						_tailA = new ArrayList();
+						_tailA = new LSDList();
 						ot.next = _tailA;
 					}
 					_tailA.object = itr.object;
@@ -103,7 +109,7 @@ public class QuadTree extends Rectangle {
 					if(_tailB.object != null)
 					{
 						ot = _tailB;
-						_tailB = new ArrayList();
+						_tailB = new LSDList();
 						ot.next = _tailB;
 					}
 					_tailB.object = itr.object;
@@ -112,21 +118,21 @@ public class QuadTree extends Rectangle {
 			}
 		}
 		else
-			_min = (width + height)/(2*FlxU.quadTreeDivisions);
-		_canSubdivide = (width > _min) || (height > _min);
+			_min = (int) ((w + h)/(2*quadTreeDivisions));
+		_canSubdivide = (w > _min) || (h > _min);
 		
 		//Set up comparison/sort helpers
 		_nw = null;
 		_ne = null;
 		_se = null;
 		_sw = null;
-		_l = x;
-		_r = x+width;
-		_hw = width/2;
+		_l = pos.x;
+		_r = pos.x+w;
+		_hw = w/2;
 		_mx = _l+_hw;
-		_t = y;
-		_b = y+height;
-		_hh = height/2;
+		_t = pos.y;
+		_b = pos.y+h;
+		_hh = h/2;
 		_my = _t+_hh;
 	}
 	
@@ -135,43 +141,41 @@ public class QuadTree extends Rectangle {
 	 * This will recursively add all group members, but
 	 * not the groups themselves.
 	 * 
-	 * @param	Object		The <code>LSDSprite</code> you want to add.  <code>FlxGroup</code> objects will be recursed and their applicable members added automatically.
+	 * @param	Obj		The <code>LSDSprite</code> you want to add.  <code>FlxGroup</code> objects will be recursed and their applicable members added automatically.
 	 * @param	List		A <code>int</code> flag indicating the list to which you want to add the objects.  Options are <code>A_LIST</code> and <code>B_LIST</code>.
 	 */
-	public void add(LSDSprite Object, int List) 
+	public void add(LSDSprite Obj, int List) 
 	{
 		_oa = List;
-		if(Object._group)
+		if(Obj instanceof LSDContainer)
 		{
-			LSDSprite m;
-			Array members = (Object as FlxGroup).members;
-			int l = members.length;
-			for(int i = 0; i < l; i++)
-			{
-				m = members[i] as LSDSprite;
-				if((m != null) && m.exists)
+			ArrayList<LSDSprite> members = ((LSDContainer)Obj).children;
+			for(LSDSprite m : members){
+				if((m != null))// TODO: figure out if exists is needed && m.exists)
 				{
-					if(m._group)
+					if(m instanceof LSDContainer){
 						add(m,List);
-					else if(m.solid)
+					}else if(m.solid)
 					{
 						_o = m;
-						_ol = _o.x;
-						_ot = _o.y;
-						_or = _o.x + _o.width;
-						_ob = _o.y + _o.height;
+						_ol = _o.pos.x;
+						_ot = _o.pos.y;
+						_or = _o.pos.x + _o.w;
+						_ob = _o.pos.y + _o.h;
 						addObject();
 					}
 				}
 			}
+
+			
 		}
-		if(Object.solid)
+		if(Obj.solid)
 		{
-			_o = Object;
-			_ol = _o.x;
-			_ot = _o.y;
-			_or = _o.x + _o.width;
-			_ob = _o.y + _o.height;
+			_o = Obj;
+			_ol = _o.pos.x;
+			_ot = _o.pos.y;
+			_or = _o.pos.x + _o.w;
+			_ob = _o.pos.y + _o.h;
 			addObject();
 		}
 	}
@@ -257,13 +261,13 @@ public class QuadTree extends Rectangle {
 	 */
 	protected void addToList() 
 	{
-		ArrayList ot;
+		LSDList ot;
 		if(_oa == A_LIST)
 		{
 			if(_tailA.object != null)
 			{
 				ot = _tailA;
-				_tailA = new ArrayList();
+				_tailA = new LSDList();
 				ot.next = _tailA;
 			}
 			_tailA.object = _o;
@@ -273,7 +277,7 @@ public class QuadTree extends Rectangle {
 			if(_tailB.object != null)
 			{
 				ot = _tailB;
-				_tailB = new ArrayList();
+				_tailB = new LSDList();
 				ot.next = _tailB;
 			}
 			_tailB.object = _o;
@@ -295,15 +299,13 @@ public class QuadTree extends Rectangle {
 	 * using <code>QuadTree.add()</code> to compare the objects that you loaded.
 	 * 
 	 * @param	BothLists	Whether you are doing an A-B list comparison, or comparing A against itself.
-	 * @param	Callback	A with two <code>LSDSprite</code> parameters - e.g. <code>myOverlapFunction(LSDSprite Object1,LSDSprite Object2);</code>  If no is provided, <code>QuadTree</code> will call <code>kill()</code> on both objects.
 	 *
 	 * @return	Whether or not any overlaps were found.
 	 */
-	public Boolean overlap(Boolean BothLists=true,Callback=null) 
+	public Boolean overlap(boolean BothLists) 
 	{
-		_oc = Callback;
 		Boolean c = false;
-		ArrayList itr;
+		LSDList itr;
 		if(BothLists)
 		{
 			//An A-B list comparison
@@ -314,7 +316,7 @@ public class QuadTree extends Rectangle {
 				while(itr != null)
 				{
 					_o = itr.object;
-					if(_o.exists && _o.solid && overlapNode())
+					if( _o.solid && overlapNode(null))
 						c = true;
 					itr = itr.next;
 				}
@@ -326,15 +328,15 @@ public class QuadTree extends Rectangle {
 				while(itr != null)
 				{
 					_o = itr.object;
-					if(_o.exists && _o.solid)
+					if( _o.solid)
 					{
-						if((_nw != null) && _nw.overlapNode())
+						if((_nw != null) && _nw.overlapNode(null))
 							c = true;
-						if((_ne != null) && _ne.overlapNode())
+						if((_ne != null) && _ne.overlapNode(null))
 							c = true;
-						if((_se != null) && _se.overlapNode())
+						if((_se != null) && _se.overlapNode(null))
 							c = true;
-						if((_sw != null) && _sw.overlapNode())
+						if((_sw != null) && _sw.overlapNode(null))
 							c = true;
 					}
 					itr = itr.next;
@@ -350,7 +352,7 @@ public class QuadTree extends Rectangle {
 				while(itr != null)
 				{
 					_o = itr.object;
-					if(_o.exists && _o.solid && overlapNode(itr.next))
+					if(_o.solid && overlapNode(itr.next))
 						c = true;
 					itr = itr.next;
 				}
@@ -358,13 +360,13 @@ public class QuadTree extends Rectangle {
 		}
 		
 		//Advance through the tree by calling overlap on each child
-		if((_nw != null) && _nw.overlap(BothLists,_oc))
+		if((_nw != null) && _nw.overlap(BothLists))
 			c = true;
-		if((_ne != null) && _ne.overlap(BothLists,_oc))
+		if((_ne != null) && _ne.overlap(BothLists))
 			c = true;
-		if((_se != null) && _se.overlap(BothLists,_oc))
+		if((_se != null) && _se.overlap(BothLists))
 			c = true;
-		if((_sw != null) && _sw.overlap(BothLists,_oc))
+		if((_sw != null) && _sw.overlap(BothLists))
 			c = true;
 		
 		return c;
@@ -377,12 +379,12 @@ public class QuadTree extends Rectangle {
 	 * 
 	 * @return	Whether or not any overlaps were found.
 	 */
-	protected Boolean overlapNode(ArrayList Iterator=null) 
+	protected Boolean overlapNode(LSDList Iterator) 
 	{
 		//member list setup
 		Boolean c = false;
 		LSDSprite co;
-		ArrayList itr = Iterator;
+		LSDList itr = Iterator;
 		if(itr == null)
 		{
 			if(_oa == A_LIST)
@@ -398,22 +400,16 @@ public class QuadTree extends Rectangle {
 			while(itr != null)
 			{
 				co = itr.object;
-				if( (_o === co) || !co.exists || !_o.exists || !co.solid || !_o.solid ||
-					(_o.x + _o.width  < co.x + FlxU.roundingError) ||
-					(_o.x + FlxU.roundingError > co.x + co.width) ||
-					(_o.y + _o.height < co.y + FlxU.roundingError) ||
-					(_o.y + FlxU.roundingError > co.y + co.height) )
+				if( (_o == co) ||  !co.solid || !_o.solid ||
+					(_o.pos.x + _o.w  < co.pos.x + LSDG.roundingError) ||
+					(_o.pos.x + LSDG.roundingError > co.pos.x + co.w) ||
+					(_o.pos.y + _o.h < co.pos.y + LSDG.roundingError) ||
+					(_o.pos.y + LSDG.roundingError > co.pos.y + co.h) )
 				{
 					itr = itr.next;
 					continue;
 				}
-				if(_oc == null)
-				{
-					_o.kill();
-					co.kill();
-					c = true;
-				}
-				else if(_oc(_o,co))
+				if(co.overlapping(_o,co))
 					c = true;
 				itr = itr.next;
 			}

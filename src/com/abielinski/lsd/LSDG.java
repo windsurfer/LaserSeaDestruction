@@ -16,8 +16,16 @@ public class LSDG{
 	  
 	  public static HashMap<Object, Boolean> keys;
 	  
+	  
+	  // some helper values
+	  
+	  public static final float roundingError = 0.000001f;
+	  
 	  public static HashMap<String, ArrayList<PImage>> cachedFrames= 
-		  new HashMap<String, ArrayList<PImage>>();;
+		  new HashMap<String, ArrayList<PImage>>();
+	  
+	  
+	  
 	  
 	  public LSDG(){
 		  LSDG.init();
