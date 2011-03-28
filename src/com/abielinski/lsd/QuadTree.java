@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import com.abielinski.lsd.util.LSDList;
 import com.abielinski.lsd.util.Rectangle;
 
+/**
+ * @author Adam
+ * A way of separating  objects for physics calculations
+ */
 public class QuadTree extends Rectangle {
 	/**
 	 * Flag for specifying that you want to add an object to the A list.
@@ -15,9 +19,9 @@ public class QuadTree extends Rectangle {
 	 */
 	static public final int B_LIST = 1;
 	
-	/*
-	* The granuality of the quad tree
-	*/
+	/**
+	 * The granuality of the quad tree
+	 */
 	static public int quadTreeDivisions = 3;
 	
 	
@@ -34,7 +38,7 @@ public class QuadTree extends Rectangle {
 	protected LSDList _tailA;
 	protected LSDList _headB;
 	protected LSDList _tailB;
-
+	
 	/**
 	 * These variables refer to the potential child quadrants for this node.
 	 */
@@ -166,7 +170,7 @@ public class QuadTree extends Rectangle {
 					}
 				}
 			}
-
+			
 			
 		}
 		if(Obj.solid)
@@ -401,10 +405,10 @@ public class QuadTree extends Rectangle {
 			{
 				co = itr.object;
 				if( (_o == co) ||  !co.solid || !_o.solid ||
-					(_o.pos.x + _o.w  < co.pos.x + LSDG.roundingError) ||
-					(_o.pos.x + LSDG.roundingError > co.pos.x + co.w) ||
-					(_o.pos.y + _o.h < co.pos.y + LSDG.roundingError) ||
-					(_o.pos.y + LSDG.roundingError > co.pos.y + co.h) )
+						(_o.pos.x + _o.w  < co.pos.x + LSDG.roundingError) ||
+						(_o.pos.x + LSDG.roundingError > co.pos.x + co.w) ||
+						(_o.pos.y + _o.h < co.pos.y + LSDG.roundingError) ||
+						(_o.pos.y + LSDG.roundingError > co.pos.y + co.h) )
 				{
 					itr = itr.next;
 					continue;
@@ -417,5 +421,5 @@ public class QuadTree extends Rectangle {
 		
 		return c;
 	}
-
+	
 }

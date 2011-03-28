@@ -17,7 +17,10 @@ public class LSDLevel extends LSDContainer{
 		this.h = he;
 		
 	}
-	
+	/*
+	 * (non-Javadoc)
+	 * @see com.abielinski.lsd.LSDSprite#init()
+	 */
 	public void init(){
 		
 	}

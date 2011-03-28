@@ -4,12 +4,16 @@ import processing.core.PApplet;
 
 import com.abielinski.lsd.LSDLevel;
 
+/**
+ * @author Adam
+ *This is an example game implementation for an example platformer.
+ */
 public class Platformer extends LSDLevel {
 	
-	/*
+	/**
 	 * This is an example level. Normally you would load this from a file, but
 	 */
-	String level = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
+	protected String level = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
 			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
 			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
 			"0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
@@ -23,14 +27,14 @@ public class Platformer extends LSDLevel {
 	
 	
 	
+	/**
+	 * Initilize the platformer with the defaults. Will tell your log you're using it!
+	 */
 	public Platformer() {
 		super();
 		PApplet.println("Using the default Platformer class. Extend this class to override defaults!");
 	}
 	
 	
-	public void nothing(){
-		
-	}
 	
 }

@@ -42,17 +42,20 @@ public class LSDTileMap extends LSDSprite {
 	 */
 	public int					auto;
 	
-	public int					_tileHeight;
-	public int					_tileWidth;
-	public int					_screenRows;
-	public int					_screenCols;	
-    public String				_bbKey;
-	public PImage				_pixels;
-	public LSDSprite			_block;
-	public ArrayList<Integer>	_data;
-	public int[]			 _frames;
+	protected int					_tileHeight;
+	protected int					_tileWidth;
+	protected int					_screenRows;
+	protected int					_screenCols;	
+	protected String				_bbKey;
+	protected PImage				_pixels;
+	protected LSDSprite			_block;
+	protected ArrayList<Integer>	_data;
+	protected int[]			 _frames;
 	
 	
+	/**
+	 * 
+	 */
 	public LSDTileMap() {
 		super();
 		
