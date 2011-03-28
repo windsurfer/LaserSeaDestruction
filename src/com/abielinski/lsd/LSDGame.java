@@ -2,12 +2,29 @@ package com.abielinski.lsd;
 
 import processing.core.PVector;
 
+/**
+ * @author Adam
+ * The main logic for a game mode. Also controls the camera. Extend this class to make your own game.
+ * Add all your objects to an instance of this object.
+ */
 public class LSDGame extends LSDContainer{
-	  public PVector cam;
-	  public LSDSprite cam_target;
-	  public float cam_speed;
+	  /**
+	 * The camera's location.
+	 */
+	public PVector cam;
+	  /**
+	 * What the camera is following
+	 */
+	public LSDSprite cam_target;
+	  /**
+	 * The "speed" the camera will follow it's target
+	 */
+	public float cam_speed;
 	  
-	  public LSDGame(){
+	  /**
+	 * Initialize the game with default logic
+	 */
+	public LSDGame(){
 	    super();
 	  }  
 	  public void init(){

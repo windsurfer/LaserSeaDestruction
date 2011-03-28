@@ -8,12 +8,17 @@ import processing.core.PImage;
 import processing.core.PVector;
 
 
+/**
+ * @author Adam
+ * A Tilemap implementation of the sprite class. Displays a map of tiles as loaded from a PNG and TXT file, comma separated,
+ * with each number relating to the index of the tile in the PNG.
+ */
 public class LSDTileMap extends LSDSprite {
 	/*
 	 * Largely converted from from flixel
 	 * https://github.com/AdamAtomic/flixel/blob/master/org/flixel/FlxTilemap.as
 	 */
-
+	
 	/**
 	 * No auto-tiling.
 	 */
@@ -27,14 +32,14 @@ public class LSDTileMap extends LSDSprite {
 	 */
 	static public final int		ALT		= 2;
 	
-	public int					collideIndex;
-	public int					startingIndex;
+	protected int					collideIndex;
+	protected int					startingIndex;
 	
-	public int					drawIndex;
+	protected int					drawIndex;
 	
-	public int					widthInTiles;
-	public int					heightInTiles;
-	public int					totalTiles;
+	protected int					widthInTiles;
+	protected int					heightInTiles;
+	protected int					totalTiles;
 	
 	/**
 	 * Set this flag to use one of the 16-tile binary auto-tile algorithms (OFF,
@@ -75,6 +80,24 @@ public class LSDTileMap extends LSDSprite {
 		_block = new LSDSprite();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.abielinski.lsd.LSDSprite#createGraphic(int, int, java.lang.String)
+	 */
+	@Override
+	public void createGraphic(int wid, int hei, String src) {
+		super.createGraphic(wid, hei, src);
+		_tileWidth = wid;
+		if (_tileWidth == 0)
+			_tileWidth = _pixels.height;
+		_tileHeight = hei;
+		if (_tileHeight == 0)
+			_tileHeight = _tileWidth;
+	}
+	
+	/**
+	 * @param MapData The location of the map data to load.
+	 * @return This object
+	 */
 	public LSDTileMap loadMap(String MapData) {
 		// Figure out the map dimensions based on the data string
 		int c;
@@ -106,12 +129,7 @@ public class LSDTileMap extends LSDSprite {
 		
 		// Figure out the size of the tiles
 		
-		_tileWidth = w;
-		if (_tileWidth == 0)
-			_tileWidth = _pixels.height;
-		_tileHeight = h;
-		if (_tileHeight == 0)
-			_tileHeight = _tileWidth;
+		
 		_block.w = _tileWidth;
 		_block.h = _tileHeight;
 		
@@ -163,8 +181,8 @@ public class LSDTileMap extends LSDSprite {
 		if ((Index % widthInTiles <= 0) || (_data.get(Index - 1) > 0)) // LEFT
 			_data.set(Index, _data.get(Index) + 8);
 		if ((auto == ALT) && (_data.get(Index) == 15)) // The alternate algo
-														// checks for interior
-														// corners
+			// checks for interior
+			// corners
 		{
 			if ((Index % widthInTiles > 0)
 					&& (Index + widthInTiles < totalTiles)
@@ -242,12 +260,12 @@ public class LSDTileMap extends LSDSprite {
 	/**
 	 * Draws the tilemap.
 	 */
-	 public void render(){
+	public void render(){
 		renderTilemap();
 	}
-	 
-	 
-	 public  void run() {
+	
+	
+	public  void run() {
 		super.run();
 	}
 	public void draw() {
