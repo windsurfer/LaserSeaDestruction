@@ -1,0 +1,14 @@
+This library was made for a game called Laser Sea Destruction, and has expanded to be suitable for many other types of games. It has some features that are a little too far away from Processing's focus group of designers.
+
+Some features are:
+
+* Time-based animation
+* Frame-map loading
+* Image caching
+* Tilemaps
+* Reasonable 2D physics (This still needs work...)
+* A display list so that sprites are shown in the correct order
+* Some handy utility functions
+* An organization framework for simple games
+
+It's still in development and I wouldn't reccomend it to anyone just yet. But soon!
