@@ -11,7 +11,7 @@ import processing.core.PVector;
 
 /**
  *	A basic sprite object that also has basic physics and animation support
- * @author Adam
+ * @author Adam and Nik
  *
  */
 public class LSDSprite extends Rectangle {

@@ -157,7 +157,7 @@ ${line}
 	<target name="parse.source" if="is.normal">
 		<path id="src.contents"><fileset dir="${project.tmp}/${project.name}/src" includes="**/*.java" /></path>
 		<property name="src.list" refid="src.contents" />
-		<foreach list="${src.list}" param="file" target="versionSourcefile" delimiter=":" />
+		<foreach list="${src.list}" param="file" target="versionSourcefile" delimiter=";" />
 	</target>
 	
 	
