@@ -9,9 +9,9 @@ import processing.core.PVector;
 
 
 /**
- * @author Adam
  * A Tilemap implementation of the sprite class. Displays a map of tiles as loaded from a PNG and TXT file, comma separated,
  * with each number relating to the index of the tile in the PNG.
+ * @author Adam
  */
 public class LSDTileMap extends LSDSprite {
 	/*

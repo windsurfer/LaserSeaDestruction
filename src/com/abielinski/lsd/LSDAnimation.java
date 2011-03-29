@@ -4,7 +4,8 @@ package com.abielinski.lsd;
 import java.util.ArrayList;
 
 /**
- * @author Adam A container class to hold an animation sequence.
+ * A container class to hold an animation sequence.
+ * @author Adam 
  */
 public class LSDAnimation {
 	

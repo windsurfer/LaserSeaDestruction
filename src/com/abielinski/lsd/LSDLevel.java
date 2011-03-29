@@ -3,6 +3,7 @@ package com.abielinski.lsd;
 
 
 /**
+ * The base level class.
  * @author Adam
  *
  */

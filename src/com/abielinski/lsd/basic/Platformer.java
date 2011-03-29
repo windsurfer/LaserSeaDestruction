@@ -5,8 +5,8 @@ import processing.core.PApplet;
 import com.abielinski.lsd.LSDLevel;
 
 /**
- * @author Adam
  *This is an example game implementation for an example platformer.
+ * @author Adam
  */
 public class Platformer extends LSDLevel {
 	

@@ -9,8 +9,8 @@ import com.abielinski.lsd.LSDLevel;
 import com.abielinski.lsd.LSDSprite;
 
 /**
- * @author Adam
  * An implementation of a level can use a bitmap for collisions
+ * @author Adam
  */
 public class BitmapLevel extends LSDLevel {
 	/*

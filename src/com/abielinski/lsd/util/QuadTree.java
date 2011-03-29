@@ -1,13 +1,14 @@
-package com.abielinski.lsd;
+package com.abielinski.lsd.util;
 
 import java.util.ArrayList;
 
-import com.abielinski.lsd.util.LSDList;
-import com.abielinski.lsd.util.Rectangle;
+import com.abielinski.lsd.LSDContainer;
+import com.abielinski.lsd.LSDG;
+import com.abielinski.lsd.LSDSprite;
 
 /**
- * @author Adam
  * A way of separating  objects for physics calculations
+ * @author Adam
  */
 public class QuadTree extends Rectangle {
 	/**

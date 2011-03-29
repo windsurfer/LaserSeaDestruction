@@ -4,6 +4,7 @@ import processing.core.PVector;
 
 
 /**
+ * A rectange class.
  * @author Adam
  *
  */

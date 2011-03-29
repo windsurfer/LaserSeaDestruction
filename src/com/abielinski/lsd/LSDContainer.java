@@ -4,8 +4,8 @@ package com.abielinski.lsd;
 import java.util.ArrayList;
 
 /**
- * @author Adam
  * A container object for organizing objects in a game. 
+ * @author Adam
  */
 public class LSDContainer extends LSDSprite {
 	

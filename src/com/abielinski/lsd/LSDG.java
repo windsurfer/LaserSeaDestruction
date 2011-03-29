@@ -9,8 +9,9 @@ import processing.core.PImage;
 import processing.core.PVector;
 
 /**
- * @author Adam A class with a collection of helpful functions and references.
+ * A class with a collection of helpful functions and references.
  *         Put a reference to your game here, and run everything from here.
+ * @author Adam 
  * 
  */
 public class LSDG {
