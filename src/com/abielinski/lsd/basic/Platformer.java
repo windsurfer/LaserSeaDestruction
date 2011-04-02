@@ -2,29 +2,46 @@ package com.abielinski.lsd.basic;
 
 import processing.core.PApplet;
 
-import com.abielinski.lsd.LSDLevel;
+import com.abielinski.lsd.LSDG;
+import com.abielinski.lsd.LSDGame;
+import com.abielinski.lsd.LSDTileMap;
 
 /**
  *This is an example game implementation for an example platformer.
  * @author Adam
  */
-public class Platformer extends LSDLevel {
+public class Platformer extends LSDGame {
 	
 	/**
 	 * This is an example level. Normally you would load this from a file, but
 	 */
-	protected String level = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
-			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
-			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
-			"0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
-			"0,0,0,0,0,0,0,9,8,7,7,6,6,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n" +
-			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,4,4,4,4,4,0,0,0,0,0,0\n" +
-			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3\n" +
-			"0,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3\n" +
-			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0\n" +
-			"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1\n" +
-			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0\n";
+	protected static final String[] level1_rows = new String[]{
+		    "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+			"0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+			"0,0,0,0,0,0,0,9,8,7,7,6,6,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,4,4,4,4,4,0,0,0,0,0,0",
+			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3",
+			"0,0,2,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3",
+			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,0,0",
+			"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1",
+			"0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"};
 	
+	/**
+	 * The width of this game
+	 */
+	public final int gameWidth = 455;
+	
+	/**
+	 * The height of this game
+	 */
+	public final int gameHeight = 168;
+	
+	
+	protected PlatformerLevel level1;
+	
+	protected PlatformerPlayer player;
 	
 	
 	/**
@@ -35,6 +52,35 @@ public class Platformer extends LSDLevel {
 		PApplet.println("Using the default Platformer class. Extend this class to override defaults!");
 	}
 	
+	/**
+	 * (non-Javadoc)
+	 * @see com.abielinski.lsd.LSDSprite#init()
+	 */
+	public void init(){
+		super.init();
+		level1 = new PlatformerLevel();
+		level1.collisionMap= new LSDTileMap(); 
+		level1.collisionMap.createGraphic(16,16,"basicPlatformerTiles.PNG");
+		level1.collisionMap.loadRows(level1_rows);
+		level1.widgetMap = new LSDTileMap();
+		
+		level1.init();
+		this.add(level1);
+		
+		player = new PlatformerPlayer(32,32);
+		
+		this.add(player);
+	}
 	
+	public void draw(){
+		super.draw();
+	}
+	
+	public void run(){
+		super.run();
+		if(LSDG.collide(player, level1)){
+			PApplet.println("Collision at "+player.pos.x);
+		}
+	}
 	
 }

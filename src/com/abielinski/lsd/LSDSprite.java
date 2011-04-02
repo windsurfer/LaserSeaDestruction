@@ -60,6 +60,11 @@ public class LSDSprite extends Rectangle {
 	
 	
 	/**
+	 * Rotation angle of the sprite
+	 */
+	public float angle;
+	
+	/**
 	 * Whether the animation is flipped when drawn. Defaults to false.
 	 */
 	public boolean flip;
@@ -92,6 +97,16 @@ public class LSDSprite extends Rectangle {
 	 * Whether this object is solid and can collide
 	 */
 	public boolean	solid;
+	
+	/**
+	 * Whether the object moves
+	 */
+	public boolean fixed;
+	
+	/**
+	 * Whether the object is on the floor (only useful for platformers, really)
+	 */
+	public boolean onFloor;
 	
 	/**
 	 * Uses defaults and places sprite at 0,0
@@ -127,9 +142,13 @@ public class LSDSprite extends Rectangle {
 		w = 0;
 		h = 0;
 		
+		
+		fixed = false;
 		solid = true;
+		onFloor = true;
 		mass = 1.0f;
 		flip = false;
+		angle = 0.0f;
 		animations = new HashMap<String, LSDAnimation>();
 		life = 1;
 		colHullX = new Rectangle();
@@ -207,6 +226,11 @@ public class LSDSprite extends Rectangle {
 		int frame = curAnimationTime;
 		int scaledFrame = (int) Math.floor(frame/curAnimation.fRate);
 		
+		if (curAnimation.loops == false && curAnimation.frames.size()<scaledFrame &&
+				animations.containsKey("idle")){
+			setAnimation("idle");
+		}
+		
 		int index = (int)(scaledFrame % (float)curAnimation.frames.size());
 		
 		return curAnimation.frames.get(index);
@@ -219,14 +243,19 @@ public class LSDSprite extends Rectangle {
 	 */
 	public  void run() {
 		prevPos = pos.get();
-		pos.x += vel.x*LSDG.frameTime();
-		pos.y += vel.y*LSDG.frameTime();
+		if (!fixed){
+			pos.x += vel.x*LSDG.frameTime();
+			pos.y += vel.y*LSDG.frameTime();
+			
+	
+			vel.x+= accel.x*LSDG.frameTime();
+			vel.y+= accel.y*LSDG.frameTime();
+			vel.x /= (drag.x*LSDG.frameTime()+1);
+			vel.y /= (drag.y*LSDG.frameTime()+1);
+		}
 		
-
-		vel.x+= accel.x*LSDG.frameTime();
-		vel.y+= accel.y*LSDG.frameTime();
-		vel.x /= (drag.x*LSDG.frameTime()+1);
-		vel.y /= (drag.y*LSDG.frameTime()+1);
+		if(solid)
+			 refreshHulls();
 		
 		// you need to draw later
 		curAnimationTime += LSDG.frameTime(); // time since last frame
@@ -240,6 +269,7 @@ public class LSDSprite extends Rectangle {
 	 */
 	public void draw() {
 		LSDG.theParent.pushMatrix();
+			LSDG.theParent.rotate(angle);
 			LSDG.theParent.translate(pos.x,pos.y);
 			LSDG.theParent.imageMode(PApplet.CENTER);
 			if (frames != null){
@@ -259,15 +289,25 @@ public class LSDSprite extends Rectangle {
 	 * Refreshes the hulls used for physics calculations based on the sprite as it was loaded.
 	 */
 	public void refreshHulls(){
-		colHullX.pos.x = pos.x;
-		colHullX.pos.y = pos.y;
+		colHullX.pos.x = pos.x-w/2.0f;
+		colHullX.pos.y = pos.y-h/2.0f;
 		colHullX.w = w;
 		colHullX.h = h;
-		colHullY.pos.x = pos.x;
-		colHullY.pos.y = pos.y;
+		colHullY.pos.x = pos.x-w/2.0f;
+		colHullY.pos.y = pos.y-h/2.0f;
 		colHullY.w = w;
 		colHullY.h = h;
 	}
+	
+	/**
+	 * Make sure you call refreshHulls() before this! Normally that's called every run() cycle, but
+	 * if you overrode that, it could be a problem.
+	 * @return The hulls this object's physics work with.
+	 */
+	public Rectangle[] getHulls(){
+		return new Rectangle[]{colHullX, colHullY};
+	}
+	
 	/**
 	 * Pulls the sprite towards point p based on strength. The mass of this object affects this.
 	 * @param p The point to get this object pulled towards
@@ -353,6 +393,52 @@ public class LSDSprite extends Rectangle {
 		vel = Evn.get();
 		
 	}
+	
+	/**
+	 * Called when this object's left side collides with another <code>LSDSprite</code>'s right.
+	 *
+	 * @param Contact The <code>LSDSprite</code> you just ran into.
+	 * @param Velocity The suggested new velocity for this object.
+	 */
+	public void hitLeft(LSDSprite Contact,float Velocity)	{
+		if(!fixed)
+			vel.x = Velocity;
+	}
+	
+	/**
+	 * Called when this object's right side collides with another <code>LSDSprite</code>'s left.
+	 *
+	 * @param Contact The <code>LSDSprite</code> you just ran into.
+	 * @param Velocity The suggested new velocity for this object.
+	 */
+	public void hitRight(LSDSprite Contact,float Velocity)	{
+		hitLeft(Contact,Velocity);
+	}
+	
+	/**
+	 * Called when this object's top collides with the bottom of another <code>LSDSprite</code>.
+	 *
+	 * @param Contact The <code>LSDSprite</code> you just ran into.
+	 * @param Velocity The suggested new velocity for this object.
+	 */
+	public void hitTop(LSDSprite Contact,float Velocity){
+		if(!fixed)
+			vel.y = Velocity;
+	}
+	
+	/**
+	 * Called when this object's bottom edge collides with the top of another <code>LSDSprite</code>.
+	 *
+	 * @param Contact The <code>LSDSprite</code> you just ran into.
+	 * @param Velocity The suggested new velocity for this object.
+	 */
+	public void hitBottom(LSDSprite Contact,float Velocity){
+		onFloor = true;
+		if(!fixed)
+			vel.y = Velocity;
+	}
+	
+	
 	
 	/**
 	 * TODO: make this work

@@ -19,7 +19,7 @@ public class BitmapLevel extends LSDLevel {
 	int[][] collisionMap;
 	
 	/**
-	 * the width in number of tiles
+	 * the width in number of pixels
 	 */
 	protected int widthNum;
 	

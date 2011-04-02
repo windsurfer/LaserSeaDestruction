@@ -67,6 +67,16 @@ public class QuadTree extends Rectangle {
 	static protected float _ob;
 	static protected int _oa;
 	
+	protected QuadTree _parent;
+	
+	/**
+	 * New QuadTree with infinite bounds
+	 */
+	public QuadTree(){
+		super();
+		init();
+	}
+	
 	/**
 	 * Instantiate a new Quad Tree node.
 	 * 
@@ -79,21 +89,23 @@ public class QuadTree extends Rectangle {
 	public QuadTree(float X, float Y, float Width, float Height, QuadTree Parent)
 	{
 		super(X,Y,Width,Height);
+		_parent = Parent;
+		init();
+	}
+	
+	protected void init(){
 		_headA = _tailA = new LSDList();
 		_headB = _tailB = new LSDList();
 		
-		/* DEBUG draw a randomly colored rectangle indicating this quadrant (may induce seizures)
-		FlxSprite brush = new FlxSprite().createGraphic(Width,Height,0xffffffff*FlxU.random());
-		FlxState.screen.draw(brush,X+FlxG.scroll.x,Y+FlxG.scroll.y);//*/
 		
 		//Copy the parent's children (if there are any)
-		if(Parent != null)
+		if(_parent != null)
 		{
 			LSDList itr;
 			LSDList ot;
-			if(Parent._headA.object != null)
+			if(_parent._headA.object != null)
 			{
-				itr = Parent._headA;
+				itr = _parent._headA;
 				while(itr != null)
 				{
 					if(_tailA.object != null)
@@ -106,9 +118,9 @@ public class QuadTree extends Rectangle {
 					itr = itr.next;
 				}
 			}
-			if(Parent._headB.object != null)
+			if(_parent._headB.object != null)
 			{
-				itr = Parent._headB;
+				itr = _parent._headB;
 				while(itr != null)
 				{
 					if(_tailB.object != null)

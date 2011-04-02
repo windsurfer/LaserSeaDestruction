@@ -4,6 +4,9 @@ package com.abielinski.lsd;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.abielinski.lsd.util.QuadTree;
+import com.abielinski.lsd.util.Rectangle;
+
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -194,12 +197,387 @@ public class LSDG {
 	}
 	
 	/**
+	 * Call this function to see if one <code>FlxObject</code> collides with another.
+	 * Can be called with one object and one group, or two groups, or two objects,
+	 * whatever floats your boat! It will put everything into a quad tree and then
+	 * check for collisions. For maximum performance try bundling a lot of objects
+	 * together using a <code>FlxGroup</code> (even bundling groups together!)
+	 * NOTE: does NOT take objects' scrollfactor into account.
+	 *
+	 * @param Object1 The first object or group you want to check.
+	 * @param Object2 The second object or group you want to check. If it is the same as the first, flixel knows to just do a comparison within that group.
+	 * @return whether they collide
+	 */
+	static public boolean collide(LSDSprite Object1,LSDSprite Object2){
+		if( (Object1 == null) ||	(Object2 == null)){
+			return false;
+		}
+		QuadTree quadTree = new QuadTree();
+		quadTree.add(Object1,QuadTree.A_LIST);
+		boolean match = Object1 == Object2;
+		if(!match){
+			quadTree.add(Object2,QuadTree.B_LIST);
+		}
+		boolean cx = quadTree.overlap(!match);
+		 if(cx){ solveXCollision(Object1, Object2);}
+		boolean cy = quadTree.overlap(!match);
+		 if(cy){ solveYCollision(Object1, Object2);}
+		return cx || cy;
+	}
+	
+	
+	/**
+	 * This quad tree callback function can be used externally as well.
+	 * Takes two objects and separates them along their X axis (if possible/reasonable).
+	 *
+	 * @param Object1 The first object or group you want to check.
+	 * @param Object2 The second object or group you want to check.
+	 * @return Whether it collides
+	 */
+	static public boolean solveXCollision(LSDSprite Object1,LSDSprite Object2){
+		//Avoid messed up collisions ahead of time
+		float o1 = Object1.vel.x;
+		float o2 = Object2.vel.x;
+		if(o1 == o2){
+			return false;
+		}
+		
+		//Basic resolution variables
+		float overlap;
+		boolean hit = false;
+		boolean p1hn2;
+		
+		//Directional variables
+		boolean obj1Stopped = o1 == 0;
+		boolean obj1MoveNeg = o1 < 0;
+		boolean obj1MovePos = o1 > 0;
+		boolean obj2Stopped = o2 == 0;
+		boolean obj2MoveNeg = o2 < 0;
+		boolean obj2MovePos = o2 > 0;
+		
+		//Offset loop variables
+		int i1;
+		int i2;
+		Rectangle obj1Hull = Object1.colHullX;
+		Rectangle obj2Hull = Object2.colHullX;
+		//ArrayList co1 = Object1.colOffsets;
+		//ArrayList co2 = Object2.colOffsets;
+		int l1 = 1;
+		int l2 = 1;
+		float ox1;
+		float oy1;
+		float ox2;
+		float oy2;
+		float r1;
+		float r2;
+		float sv1;
+		float sv2;
+		
+		//Decide based on object's movement patterns if it was a right-side or left-side collision
+		p1hn2 = ((obj1Stopped && obj2MoveNeg) || (obj1MovePos && obj2Stopped) || (obj1MovePos && obj2MoveNeg) || //the obvious cases
+				(obj1MoveNeg && obj2MoveNeg && (((o1>0)?o1:-o1) < ((o2>0)?o2:-o2))) || //both moving left, obj2 overtakes obj1
+				(obj1MovePos && obj2MovePos && (((o1>0)?o1:-o1) > ((o2>0)?o2:-o2))) ); //both moving right, obj1 overtakes obj2
+		
+		
+		
+		//this looks insane, but we're just looping through collision offsets on each object
+		for(i1 = 0; i1 < l1; i1++)
+		{
+			ox1 = 0;
+			oy1 = 0;
+			obj1Hull.pos.x += ox1;
+			obj1Hull.pos.y += oy1;
+			for(i2 = 0; i2 < l2; i2++)
+			{
+				ox2 = 0;
+				oy2 = 0;
+				obj2Hull.pos.x += ox2;
+				obj2Hull.pos.y += oy2;
+				
+				//See if it's a actually a valid collision
+				if( (obj1Hull.pos.x + obj1Hull.w < obj2Hull.pos.x + roundingError) ||
+						(obj1Hull.pos.x + roundingError > obj2Hull.pos.x + obj2Hull.w) ||
+						(obj1Hull.pos.y + obj1Hull.h < obj2Hull.pos.y + roundingError) ||
+						(obj1Hull.pos.y + roundingError > obj2Hull.pos.y + obj2Hull.h) )
+				{
+					obj2Hull.pos.x -= ox2;
+					obj2Hull.pos.y -= oy2;
+					continue;
+				}
+				
+				//Calculate the overlap between the objects
+				if(p1hn2)
+				{
+					if(obj1MoveNeg)
+						r1 = obj1Hull.pos.x + Object1.colHullY.w;
+					else
+						r1 = obj1Hull.pos.x + obj1Hull.w;
+					if(obj2MoveNeg)
+						r2 = obj2Hull.pos.x;
+					else
+						r2 = obj2Hull.pos.x + obj2Hull.w - Object2.colHullY.w;
+				}
+				else
+				{
+					if(obj2MoveNeg)
+						r1 = -obj2Hull.pos.x - Object2.colHullY.w;
+					else
+						r1 = -obj2Hull.pos.x - obj2Hull.w;
+					if(obj1MoveNeg)
+						r2 = -obj1Hull.pos.x;
+					else
+						r2 = -obj1Hull.pos.x - obj1Hull.w + Object1.colHullY.w;
+				}
+				overlap = r1 - r2;
+				
+				//Last chance to skip out on a bogus collision resolution
+				if( (overlap == 0) ||
+						((!Object1.fixed && ((overlap>0)?overlap:-overlap) > obj1Hull.w*0.8)) ||
+						((!Object2.fixed && ((overlap>0)?overlap:-overlap) > obj2Hull.w*0.8)) )
+				{
+					obj2Hull.pos.x -= ox2;
+					obj2Hull.pos.y -= oy2;
+					continue;
+				}
+				hit = true;
+				
+				//Adjust the objects according to their flags and stuff
+				sv1 = Object2.vel.x;
+				sv2 = Object1.vel.x;
+				if(!Object1.fixed && Object2.fixed)
+				{
+					Object1.pos.x -= overlap;
+				}
+				else if(Object1.fixed && !Object2.fixed)
+				{
+					Object2.pos.x += overlap;
+				}
+				else if(!Object1.fixed && !Object2.fixed)
+				{
+					overlap /= 2;
+					Object1.pos.x -= overlap;
+					Object2.pos.x += overlap;
+					sv1 /= 2;
+					sv2 /= 2;
+				}
+				if(p1hn2)
+				{
+					Object1.hitRight(Object2,sv1);
+					Object2.hitLeft(Object1,sv2);
+				}
+				else
+				{
+					Object1.hitLeft(Object2,sv1);
+					Object2.hitRight(Object1,sv2);
+				}
+				
+				//Adjust collision hulls if necessary
+				if(!Object1.fixed && (overlap != 0))
+				{
+					if(p1hn2)
+						obj1Hull.w -= overlap;
+					else
+					{
+						obj1Hull.pos.x -= overlap;
+						obj1Hull.w += overlap;
+					}
+					Object1.colHullY.pos.x -= overlap;
+				}
+				if(!Object2.fixed && (overlap != 0))
+				{
+					if(p1hn2)
+					{
+						obj2Hull.pos.x += overlap;
+						obj2Hull.w -= overlap;
+					}
+					else
+						obj2Hull.w += overlap;
+					Object2.colHullY.pos.x += overlap;
+				}
+				obj2Hull.pos.x -= ox2;
+			obj2Hull.pos.y -= oy2;
+		}
+		obj1Hull.pos.x -= ox1;
+		obj1Hull.pos.y -= oy1;
+	}
+	
+	return hit;
+	}
+	
+	/**
+	 * This quad tree callback function can be used externally as well.
+	 * Takes two objects and separates them along their Y axis (if possible/reasonable).
+	 *
+	 * @param Object1 The first object or group you want to check.
+	 * @param Object2 The second object or group you want to check.
+	 * @return Whether they collide
+	 */
+	static public boolean solveYCollision(LSDSprite Object1, LSDSprite Object2){
+		//Avoid messed up collisions ahead of time
+		float o1 = Object1.vel.y;
+		float o2 = Object2.vel.y;
+		if (o1 == o2)
+			return false;
+		
+		// Basic resolution variables
+		float overlap;
+		boolean hit = false;
+		boolean p1hn2;
+		
+		// Directional variables
+		boolean obj1Stopped = o1 == 0;
+		boolean obj1MoveNeg = o1 < 0;
+		boolean obj1MovePos = o1 > 0;
+		boolean obj2Stopped = o2 == 0;
+		boolean obj2MoveNeg = o2 < 0;
+		boolean obj2MovePos = o2 > 0;
+		
+		// Offset loop variables
+		int i1;
+		int i2;
+		Rectangle obj1Hull = Object1.colHullY;
+		Rectangle obj2Hull = Object2.colHullY;
+		int l1 = 1;
+		int l2 = 1;
+		float ox1;
+		float oy1;
+		float ox2;
+		float oy2;
+		float r1;
+		float r2;
+		float sv1;
+		float sv2;
+		
+		// Decide based on object's movement patterns if it was a top or bottom
+		// collision
+		p1hn2 = ((obj1Stopped && obj2MoveNeg) || (obj1MovePos && obj2Stopped) || (obj1MovePos && obj2MoveNeg) || // the
+				// obvious
+				// cases
+				(obj1MoveNeg && obj2MoveNeg && (((o1 > 0) ? o1 : -o1) < ((o2 > 0) ? o2 : -o2))) || // both
+				// moving
+				// up,
+				// obj2
+				// overtakes
+				// obj1
+				(obj1MovePos && obj2MovePos && (((o1 > 0) ? o1 : -o1) > ((o2 > 0) ? o2 : -o2)))); // both
+		// moving
+		// down,
+		// obj1
+		// overtakes
+		// obj2
+		
+		// this looks insane, but we're just looping through collision offsets
+		// on each object
+		for (i1 = 0; i1 < l1; i1++){
+			ox1 = 0;
+			oy1 = 0;
+			obj1Hull.pos.x += ox1;
+			obj1Hull.pos.y += oy1;
+			for (i2 = 0; i2 < l2; i2++){
+				ox2 = 0;
+				oy2 = 0;
+				obj2Hull.pos.x += ox2;
+				obj2Hull.pos.y += oy2;
+				
+				// See if it's a actually a valid collision
+				if ((obj1Hull.pos.x + obj1Hull.w < obj2Hull.pos.x + roundingError)
+						|| (obj1Hull.pos.x + roundingError > obj2Hull.pos.x + obj2Hull.w)
+						|| (obj1Hull.pos.y + obj1Hull.h < obj2Hull.pos.y + roundingError)
+						|| (obj1Hull.pos.y + roundingError > obj2Hull.pos.y + obj2Hull.h)){
+					obj2Hull.pos.x -= ox2;
+					obj2Hull.pos.y -= oy2;
+					continue;
+				}
+				
+				// Calculate the overlap between the objects
+				if (p1hn2){
+					if (obj1MoveNeg)
+						r1 = obj1Hull.pos.y + Object1.colHullX.h;
+					else
+						r1 = obj1Hull.pos.y + obj1Hull.h;
+					if (obj2MoveNeg)
+						r2 = obj2Hull.pos.y;
+					else
+						r2 = obj2Hull.pos.y + obj2Hull.h - Object2.colHullX.h;
+				}else{
+					if (obj2MoveNeg)
+						r1 = -obj2Hull.pos.y - Object2.colHullX.h;
+					else
+						r1 = -obj2Hull.pos.y - obj2Hull.h;
+					if (obj1MoveNeg)
+						r2 = -obj1Hull.pos.y;
+					else
+						r2 = -obj1Hull.pos.y - obj1Hull.h + Object1.colHullX.h;
+				}
+				overlap = r1 - r2;
+				
+				// Last chance to skip out on a bogus collision resolution
+				if ((overlap == 0) || ((!Object1.fixed && ((overlap > 0) ? overlap : -overlap) > obj1Hull.h * 0.8))
+						|| ((!Object2.fixed && ((overlap > 0) ? overlap : -overlap) > obj2Hull.h * 0.8))){
+					obj2Hull.pos.x -= ox2;
+					obj2Hull.pos.y -= oy2;
+					continue;
+				}
+				hit = true;
+				
+				// Adjust the objects according to their flags and stuff
+				sv1 = Object2.vel.y;
+				sv2 = Object1.vel.y;
+				if (!Object1.fixed && Object2.fixed){
+					Object1.pos.y -= overlap;
+				}else if (Object1.fixed && !Object2.fixed){
+					Object2.pos.y += overlap;
+				}else if (!Object1.fixed && !Object2.fixed){
+					overlap /= 2;
+					Object1.pos.y -= overlap;
+					Object2.pos.y += overlap;
+					sv1 /= 2;
+					sv2 /= 2;
+				}
+				if (p1hn2){
+					Object1.hitBottom(Object2, sv1);
+					Object2.hitTop(Object1, sv2);
+				}else{
+					Object1.hitTop(Object2, sv1);
+					Object2.hitBottom(Object1, sv2);
+				}
+				
+				// Adjust collision hulls if necessary
+				if (!Object1.fixed && (overlap != 0)){
+					if (p1hn2){
+						obj1Hull.pos.y -= overlap;
+						
+					}else{
+						obj1Hull.pos.y -= overlap;
+						obj1Hull.h += overlap;
+					}
+				}
+				if (!Object2.fixed && (overlap != 0)){
+					if (p1hn2){
+						obj2Hull.pos.y += overlap;
+						obj2Hull.h -= overlap;
+					}else{
+						obj2Hull.h += overlap;
+						
+					}
+				}
+				obj2Hull.pos.x -= ox2;
+				obj2Hull.pos.y -= oy2;
+			}
+			obj1Hull.pos.x -= ox1;
+			obj1Hull.pos.y -= oy1;
+	}
+	
+	return hit;
+	}
+	
+	/**
 	 * A simple and ineffecient way of seeing if two LSDSprite objects are colliding.
 	 * @param obj1
 	 * @param obj2
 	 * @return whether they are colliding.
 	 */
-	public static boolean collide(LSDSprite obj1, LSDSprite obj2) {
+	public static boolean simpleCollide(LSDSprite obj1, LSDSprite obj2) {
 		if (obj1 == null || obj2 == null){
 			return false;
 		}
@@ -218,7 +596,7 @@ public class LSDG {
 	 * @param level
 	 * @return whether they are colliding
 	 */
-	public static PVector collideLevel(LSDSprite sprite, LSDLevel level) {
+	public static PVector simpleCollideLevel(LSDSprite sprite, LSDLevel level) {
 		if (level == null || sprite == null){
 			return null;
 		}

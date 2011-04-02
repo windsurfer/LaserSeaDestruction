@@ -7,32 +7,36 @@ import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
-
 /**
- * A Tilemap implementation of the sprite class. Displays a map of tiles as loaded from a PNG and TXT file, comma separated,
- * with each number relating to the index of the tile in the PNG.
+ * A Tilemap implementation of the sprite class. Displays a map of tiles as
+ * loaded from a PNG and TXT file, comma separated, with each number relating to
+ * the index of the tile in the PNG.
+ * 
  * @author Adam
  */
-public class LSDTileMap extends LSDSprite {
+public class LSDTileMap extends LSDContainer {
 	/*
 	 * Largely converted from from flixel
 	 * https://github.com/AdamAtomic/flixel/blob/master/org/flixel/FlxTilemap.as
 	 */
-	
+
 	/**
 	 * No auto-tiling.
 	 */
-	static public final int		OFF		= 0;
+	static public final int			OFF		= 0;
 	/**
 	 * Platformer-friendly auto-tiling.
 	 */
-	static public final int		AUTO	= 1;
+	static public final int			AUTO	= 1;
 	/**
 	 * Top-down auto-tiling.
 	 */
-	static public final int		ALT		= 2;
+	static public final int			ALT		= 2;
 	
-	protected int					collideIndex;
+	/**
+	 * The index on the map that, after which, collisions start
+	 */
+	public   int					collideIndex;
 	protected int					startingIndex;
 	
 	protected int					drawIndex;
@@ -45,18 +49,17 @@ public class LSDTileMap extends LSDSprite {
 	 * Set this flag to use one of the 16-tile binary auto-tile algorithms (OFF,
 	 * AUTO, or ALT).
 	 */
-	public int					auto;
+	public int						auto;
 	
 	protected int					_tileHeight;
 	protected int					_tileWidth;
 	protected int					_screenRows;
-	protected int					_screenCols;	
+	protected int					_screenCols;
 	protected String				_bbKey;
 	protected PImage				_pixels;
-	protected LSDSprite			_block;
+	protected LSDSprite				_block;
 	protected ArrayList<Integer>	_data;
-	protected int[]			 _frames;
-	
+	protected int[]					_frames;
 	
 	/**
 	 * 
@@ -80,10 +83,12 @@ public class LSDTileMap extends LSDSprite {
 		_block = new LSDSprite();
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.abielinski.lsd.LSDSprite#createGraphic(int, int, java.lang.String)
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.abielinski.lsd.LSDSprite#createGraphic(int, int,
+	 * java.lang.String)
 	 */
-	@Override
 	public void createGraphic(int wid, int hei, String src) {
 		super.createGraphic(wid, hei, src);
 		_tileWidth = wid;
@@ -95,14 +100,25 @@ public class LSDTileMap extends LSDSprite {
 	}
 	
 	/**
-	 * @param MapData The location of the map data to load.
+	 * @param mapLocation
+	 *            The location of the map data to load.
 	 * @return This object
 	 */
-	public LSDTileMap loadMap(String MapData) {
+	public LSDTileMap loadMap(String mapLocation) {
 		// Figure out the map dimensions based on the data string
+		
+		String[] rows = LSDG.theParent.loadStrings(mapLocation);
+		return loadRows(rows);
+	}
+	
+	/**
+	 * @param rows the rows of the tilemap
+	 * @return this object
+	 */
+	public LSDTileMap loadRows(String[] rows){
 		int c;
 		String[] cols;
-		String[] rows = LSDG.theParent.loadStrings(MapData);
+		
 		heightInTiles = rows.length;
 		_data = new ArrayList<Integer>();
 		for (int r = 0; r < heightInTiles; r++){
@@ -113,8 +129,17 @@ public class LSDTileMap extends LSDSprite {
 			}
 			if (widthInTiles == 0)
 				widthInTiles = cols.length;
-			for (c = 0; c < widthInTiles; c++)
-				_data.add(Integer.decode(cols[c]));
+			for (c = 0; c < widthInTiles; c++){
+				try{
+					_data.add(Integer.decode(cols[c]));
+				}catch(NumberFormatException e){
+					PApplet.println("Error parsing string for tileMap: "+ cols[c]);
+					//c--;
+					//widthInTiles--;
+					//TODO: Warn about it, maybe?
+				}
+			}
+
 		}
 		
 		// Pre-process the map data if it's auto-tiled
@@ -128,7 +153,6 @@ public class LSDTileMap extends LSDSprite {
 		}
 		
 		// Figure out the size of the tiles
-		
 		
 		_block.w = _tileWidth;
 		_block.h = _tileHeight;
@@ -149,12 +173,11 @@ public class LSDTileMap extends LSDSprite {
 		if (_screenCols > widthInTiles)
 			_screenCols = widthInTiles;
 		
-		
-		//generateBoundingTiles();
+		// generateBoundingTiles();
 		refreshHulls();
 		
-		//_buffer = new PImage(w, h);
-		//render();
+		// _buffer = new PImage(w, h);
+		// render();
 		
 		return this;
 	}
@@ -172,31 +195,23 @@ public class LSDTileMap extends LSDSprite {
 		_data.set(Index, 0);
 		if ((Index - widthInTiles < 0) || (_data.get(Index - widthInTiles) > 0)) // UP
 			_data.set(Index, _data.get(Index) + 1);
-		if ((Index % widthInTiles >= widthInTiles - 1)
-				|| (_data.get(Index + 1) > 0)) // RIGHT
+		if ((Index % widthInTiles >= widthInTiles - 1) || (_data.get(Index + 1) > 0)) // RIGHT
 			_data.set(Index, _data.get(Index) + 2);
-		if ((Index + widthInTiles >= totalTiles)
-				|| (_data.get(Index + widthInTiles) > 0)) // DOWN
+		if ((Index + widthInTiles >= totalTiles) || (_data.get(Index + widthInTiles) > 0)) // DOWN
 			_data.set(Index, _data.get(Index) + 4);
 		if ((Index % widthInTiles <= 0) || (_data.get(Index - 1) > 0)) // LEFT
 			_data.set(Index, _data.get(Index) + 8);
 		if ((auto == ALT) && (_data.get(Index) == 15)) // The alternate algo
-			// checks for interior
-			// corners
+		// checks for interior
+		// corners
 		{
-			if ((Index % widthInTiles > 0)
-					&& (Index + widthInTiles < totalTiles)
-					&& (_data.get(Index + widthInTiles - 1) <= 0))
+			if ((Index % widthInTiles > 0) && (Index + widthInTiles < totalTiles) && (_data.get(Index + widthInTiles - 1) <= 0))
 				_data.set(Index, 1); // BOTTOM LEFT OPEN
-			if ((Index % widthInTiles > 0) && (Index - widthInTiles >= 0)
-					&& (_data.get(Index - widthInTiles - 1) <= 0))
+			if ((Index % widthInTiles > 0) && (Index - widthInTiles >= 0) && (_data.get(Index - widthInTiles - 1) <= 0))
 				_data.set(Index, 2); // TOP LEFT OPEN
-			if ((Index % widthInTiles < widthInTiles)
-					&& (Index - widthInTiles >= 0)
-					&& (_data.get(Index - widthInTiles + 1) <= 0))
+			if ((Index % widthInTiles < widthInTiles) && (Index - widthInTiles >= 0) && (_data.get(Index - widthInTiles + 1) <= 0))
 				_data.set(Index, 4); // TOP RIGHT OPEN
-			if ((Index % widthInTiles < widthInTiles)
-					&& (Index + widthInTiles < totalTiles)
+			if ((Index % widthInTiles < widthInTiles) && (Index + widthInTiles < totalTiles)
 					&& (_data.get(Index + widthInTiles + 1) <= 0))
 				_data.set(Index, 8); // BOTTOM RIGHT OPEN
 		}
@@ -204,23 +219,21 @@ public class LSDTileMap extends LSDSprite {
 	}
 	
 	/**
-	 * Internal function used in setTileByIndex() and the constructor to update the map.
-	 *
-	 * @param Index The index of the tile you want to update.
+	 * Internal function used in setTileByIndex() and the constructor to update
+	 * the map.
+	 * 
+	 * @param Index
+	 *            The index of the tile you want to update.
 	 */
-	protected void updateTile(int Index)
-	{
-		if(_data.get(Index) < drawIndex)
-		{
-			_frames[Index] =  0;
+	protected void updateTile(int Index) {
+		if (_data.get(Index) < drawIndex){
+			_frames[Index] = 0;
 			return;
 		}
 		_frames[Index] = _data.get(Index);
 	}
 	
-	protected void renderTilemap(){
-		//Bounding box display options
-		
+	protected void renderTilemap() {
 		
 		PVector _point = new PVector();
 		getScreenXY(_point);
@@ -228,24 +241,27 @@ public class LSDTileMap extends LSDSprite {
 		_flashPoint.x = _point.x;
 		_flashPoint.y = _point.y;
 		
-		
-		int tx = (int) Math.floor(-_flashPoint.x/_tileWidth);
-		int ty = (int) Math.floor(-_flashPoint.y/_tileHeight);
-		if(tx < 0) tx = 0;
-		if(tx > widthInTiles-_screenCols) tx = widthInTiles-_screenCols;
-		if(ty < 0) ty = 0;
-		if(ty > heightInTiles-_screenRows) ty = heightInTiles-_screenRows;
-		int ri = ty*widthInTiles+tx;
-		_flashPoint.x += tx*_tileWidth;
-		_flashPoint.y += ty*_tileHeight;
+		int tx = (int) Math.floor(-_flashPoint.x / _tileWidth);
+		int ty = (int) Math.floor(-_flashPoint.y / _tileHeight);
+		if (tx < 0)
+			tx = 0;
+		if (tx > widthInTiles - _screenCols)
+			tx = widthInTiles - _screenCols;
+		if (ty < 0)
+			ty = 0;
+		if (ty > heightInTiles - _screenRows)
+			ty = heightInTiles - _screenRows;
+		int ri = ty * widthInTiles + tx;
+		_flashPoint.x += tx * _tileWidth;
+		_flashPoint.y += ty * _tileHeight;
 		int opx = (int) _flashPoint.x;
 		int c;
 		int cri;
-		for(int r = 0; r < _screenRows; r++){
+		for (int r = 0; r < _screenRows; r++){
 			cri = ri;
-			for(c = 0; c < _screenCols; c++){
+			for (c = 0; c < _screenCols; c++){
 				int i = _frames[cri];
-				if(_flashPoint != null){
+				if (_flashPoint != null){
 					LSDG.theParent.image(frames.get(i), _flashPoint.x, _flashPoint.y);
 				}
 				_flashPoint.x += _tileWidth;
@@ -260,20 +276,20 @@ public class LSDTileMap extends LSDSprite {
 	/**
 	 * Draws the tilemap.
 	 */
-	public void render(){
+	public void render() {
 		renderTilemap();
 	}
 	
-	
-	public  void run() {
+	public void run() {
 		super.run();
 	}
+	
 	public void draw() {
-		LSDG.theParent.translate(pos.x,pos.y);
+		LSDG.theParent.translate(pos.x, pos.y);
 		LSDG.theParent.imageMode(PApplet.CENTER);
 		if (frames != null){
-			if(flip){
-				LSDG.theParent.scale(-1.0f,1.0f);
+			if (flip){
+				LSDG.theParent.scale(-1.0f, 1.0f);
 			}
 			LSDG.theParent.scale(this.scale, this.scale);
 			render();
