@@ -1,0 +1,4 @@
+class Maingame extends LSDGame{
+  
+  
+}
