@@ -41,6 +41,11 @@ public class LSDSprite extends Rectangle {
 	 */
 	public Rectangle colHullY;
 	
+	/**
+	 * I'm not really sure how colHullX is better than this
+	 */
+	ArrayList<Rectangle> hulls;
+	
 	
 	/**
 	 * A value used in "push" and "pull" operations. 
@@ -96,7 +101,7 @@ public class LSDSprite extends Rectangle {
 	/**
 	 * Whether this object is solid and can collide
 	 */
-	public boolean	solid;
+	public boolean solid;
 	
 	/**
 	 * Whether the object moves
@@ -153,6 +158,7 @@ public class LSDSprite extends Rectangle {
 		life = 1;
 		colHullX = new Rectangle();
 		colHullY = new Rectangle();
+		hulls = new ArrayList<Rectangle>();
 	}
 	
 	/**
@@ -262,6 +268,7 @@ public class LSDSprite extends Rectangle {
 		if (newAnimation!=curAnimation){
 			curAnimation = newAnimation;
 			curAnimationTime = 0;
+			newAnimation= curAnimation;
 		}
 	}
 	/**
@@ -297,8 +304,23 @@ public class LSDSprite extends Rectangle {
 		colHullY.pos.y = pos.y-h/2.0f;
 		colHullY.w = w;
 		colHullY.h = h;
+		
+		// new code not from flixel
+		hulls.clear();
+		hulls.add(colHullX);
 	}
 	
+	
+	/**
+	 * Returns the generated hulls used for physics calculations
+	 * @param sprite The sprite that will be colliding with this sprite. Can be blank
+	 * @return All the hulls that could possible collide with sprite
+	 */
+	public ArrayList<Rectangle> getHulls(LSDSprite sprite){
+		hulls.clear();
+		hulls.add(new Rectangle(0,0,w,h));
+	    return hulls;
+	}
 	/**
 	 * Make sure you call refreshHulls() before this! Normally that's called every run() cycle, but
 	 * if you overrode that, it could be a problem.

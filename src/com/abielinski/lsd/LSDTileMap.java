@@ -3,6 +3,9 @@ package com.abielinski.lsd;
 
 import java.util.ArrayList;
 
+import com.abielinski.lsd.basic.PlatformerPlayer;
+import com.abielinski.lsd.util.Rectangle;
+
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -14,7 +17,7 @@ import processing.core.PVector;
  * 
  * @author Adam
  */
-public class LSDTileMap extends LSDContainer {
+public class LSDTileMap extends LSDSprite {
 	/*
 	 * Largely converted from from flixel
 	 * https://github.com/AdamAtomic/flixel/blob/master/org/flixel/FlxTilemap.as
@@ -233,6 +236,21 @@ public class LSDTileMap extends LSDContainer {
 		_frames[Index] = _data.get(Index);
 	}
 	
+	
+	public ArrayList<Rectangle> getHulls(LSDSprite sprite){
+		if (sprite == null){
+			hulls.clear();
+			hulls.add(new Rectangle(0,0,w,h));
+		    return hulls;
+		}
+		hulls.clear();
+		//int spriteTileX = (int) Math.floor((sprite.pos.x - this.pos.x)/_tileWidth);
+		//int spriteTileY = (int) Math.floor((sprite.pos.y - this.pos.y)/_tileHeight);
+		
+		
+		return hulls;
+	}
+	
 	protected void renderTilemap() {
 		
 		PVector _point = new PVector();
@@ -271,6 +289,65 @@ public class LSDTileMap extends LSDContainer {
 			_flashPoint.x = opx;
 			_flashPoint.y += _tileHeight;
 		}
+	}
+	
+	 /**
+	* Check the value of a particular tile.
+	*
+	* @param X The X coordinate of the tile (in tiles, not pixels).
+	* @param Y The Y coordinate of the tile (in tiles, not pixels).
+	*
+	* @return A uint containing the value of the tile at this spot in the array.
+	*/
+	public int getTile(int X,int Y){
+		return getTileByIndex(Y * widthInTiles + X);
+	}
+
+	/**
+	* Get the value of a tile in the tilemap by index.
+	*
+	* @param Index The slot in the data array (Y * widthInTiles + X) where this tile is stored.
+	*
+	* @return A uint containing the value of the tile at this spot in the array.
+	*/
+	public int getTileByIndex(int Index){
+		return _data.get(Index);
+	}
+	
+	/**
+	 * @param Index
+	 * @param className
+	 * @return whether the 
+	 */
+	public ArrayList<Object> replaceTilesByIndex(int Index, String className){
+		ArrayList<Object> _group = new ArrayList<Object>();
+		//TODO: locate tiles
+		for(int i = 0; i< widthInTiles*heightInTiles;i++){
+			if(getTileByIndex(i)==Index){
+				LSDSprite newObject;
+				try{
+					newObject= (LSDSprite)Class.forName(className).newInstance();
+				}catch (InstantiationException e){
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					continue;
+				}catch (IllegalAccessException e){
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					continue;
+				}catch (ClassNotFoundException e){
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					continue;
+				}
+				if(newObject != null){
+					_group.add(newObject);
+					newObject.pos.x = i%widthInTiles*_tileWidth;
+					newObject.pos.y = (int)i/heightInTiles*_tileHeight;
+				}
+			}
+		}
+		return _group;
 	}
 	
 	/**

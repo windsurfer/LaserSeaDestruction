@@ -58,6 +58,8 @@ public class Platformer extends LSDGame {
 	 */
 	public void init(){
 		super.init();
+		
+		
 		level1 = new PlatformerLevel();
 		level1.collisionMap= new LSDTileMap(); 
 		level1.collisionMap.createGraphic(16,16,"basicPlatformerTiles.PNG");
@@ -70,6 +72,7 @@ public class Platformer extends LSDGame {
 		player = new PlatformerPlayer(32,32);
 		
 		this.add(player);
+		
 	}
 	
 	public void draw(){
@@ -78,8 +81,10 @@ public class Platformer extends LSDGame {
 	
 	public void run(){
 		super.run();
-		if(LSDG.collide(player, level1)){
-			PApplet.println("Collision at "+player.pos.x);
+		LSDG.collide(player, level1);
+		if (player.pos.y > LSDG.theParent.height){
+			player.pos.y = LSDG.theParent.height;
+			player.vel.y = -0.1f;
 		}
 	}
 	

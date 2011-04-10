@@ -54,6 +54,10 @@ public class PlatformerPlayer extends LSDSprite {
 	    
 	    //PApplet.println("Running player");
 	}
+	public void hitBottom(LSDSprite Contact,float Velocity){
+		super.hitBottom(Contact, Velocity);
+		PApplet.println("Collision at "+pos.x);
+	}
 	
 	
 }

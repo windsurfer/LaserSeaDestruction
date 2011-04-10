@@ -437,8 +437,12 @@ public class LSDG {
 		int i2;
 		Rectangle obj1Hull = Object1.colHullY;
 		Rectangle obj2Hull = Object2.colHullY;
-		int l1 = 1;
-		int l2 = 1;
+		
+		ArrayList<Rectangle> co1 = Object1.hulls;
+		ArrayList<Rectangle> co2 = Object2.hulls;
+		
+		int l1 = co1.size();
+		int l2 = co2.size();
 		float ox1;
 		float oy1;
 		float ox2;
@@ -466,18 +470,22 @@ public class LSDG {
 		// overtakes
 		// obj2
 		
-		// this looks insane, but we're just looping through collision offsets
+		// this looks insane, but we're just looping through collision rectangles
 		// on each object
 		for (i1 = 0; i1 < l1; i1++){
-			ox1 = 0;
-			oy1 = 0;
+			ox1 = co1.get(i1).pos.x;
+			oy1 = co1.get(i1).pos.y;
 			obj1Hull.pos.x += ox1;
 			obj1Hull.pos.y += oy1;
+			obj1Hull.w = co1.get(i1).w;
+			obj1Hull.h = co1.get(i1).h;
 			for (i2 = 0; i2 < l2; i2++){
-				ox2 = 0;
-				oy2 = 0;
+				ox2 = co2.get(i2).pos.x;
+				oy2 = co2.get(i2).pos.x;
 				obj2Hull.pos.x += ox2;
 				obj2Hull.pos.y += oy2;
+				obj2Hull.w = co2.get(i2).w;
+				obj2Hull.h = co2.get(i2).h;
 				
 				// See if it's a actually a valid collision
 				if ((obj1Hull.pos.x + obj1Hull.w < obj2Hull.pos.x + roundingError)
@@ -567,7 +575,8 @@ public class LSDG {
 			obj1Hull.pos.x -= ox1;
 			obj1Hull.pos.y -= oy1;
 	}
-	
+
+		PApplet.println("Collision? " + hit);
 	return hit;
 	}
 	
