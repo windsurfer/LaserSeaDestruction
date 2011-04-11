@@ -7,12 +7,15 @@ class Player extends LSDSprite{
      super(xpos,ypos);
      index = 1;
      slowDown = .98;
+     colHullX = new Rectangle(xpos,ypos,25,25);
+     colHullY = new Rectangle(xpos,ypos,25,25);
      init(); 
   }
   
   void init(){
    println("player here"); 
    this.createGraphic(25,25,"ship.png");
+   
    ArrayList<Integer> a = new ArrayList();
    a.add(0);
    
@@ -27,6 +30,7 @@ class Player extends LSDSprite{
    drag.x = 0.03;
     drag.y = 0.03;
     accel.y = 0.0;
+    fixed = false;
 //   onGround = false;
    
   }
