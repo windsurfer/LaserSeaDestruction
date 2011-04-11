@@ -30,12 +30,13 @@ void draw(){
   background(0);
   LSDG.update();
   controls.run();
-
+  
 }
 
 void keyPressed(){
   if (key == CODED) {
     LSDG.keyCodePress(keyCode);
+    
   }else{
     LSDG.keyPress(key);
   }

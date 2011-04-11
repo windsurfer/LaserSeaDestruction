@@ -22,6 +22,12 @@ void run(){
       stats.add(false);
     }
     
+    if(LSDG.keys(CONTROL)){
+      stats.add(true);
+    }else{
+      stats.add(false);
+    }
+    
     playerMap.put(1,stats);
     
   }
