@@ -1,10 +1,12 @@
 class Player extends LSDSprite{
  
   int index;
+  float slowDown;
   
   public Player(float xpos, float ypos){
      super(xpos,ypos);
-     index = 0;
+     index = 1;
+     slowDown = .98;
      init(); 
   }
   
@@ -23,7 +25,7 @@ class Player extends LSDSprite{
    setAnimation("idle");
    
    drag.x = 0.03;
-    drag.y = 0.005;
+    drag.y = 0.03;
     accel.y = 0.0;
 //   onGround = false;
    
@@ -31,25 +33,30 @@ class Player extends LSDSprite{
   
   void run(){
    super.run();
-  
+  // println("player run");
    if(pos.y > height)pos.y = 0; 
    if(pos.y < 0)pos.y = height; 
    if(pos.x < 0)pos.x = width;
    if(pos.y > width)pos.x = 0;
-  
+   //println(controls.playerMap.get(index));
    if (controls.playerMap.get(index) != null){
      
-   angle = (Float)((ArrayList)controls.playerMap.get(index)).get(0); 
-     
-     if((Boolean)((ArrayList)controls.playerMap.get(index)).get(1)){
-       accel.y = 0.002;
+    angle += radians((Float)((ArrayList)controls.playerMap.get(index)).get(0)); 
+//     println("somthing");
+    if((Boolean)((ArrayList)controls.playerMap.get(index)).get(1)){
+       accel.y -= 0.0002;
+//       println("vroom");
+        setAnimation("moving");
+     }else{
+       setAnimation("idle");
      }
      if((Boolean)((ArrayList)controls.playerMap.get(index)).get(2)){
-       println("bang");
+//       println("bang");
      }
       
     }
-  
+    accel.y = accel.y*slowDown;
+    
   } 
   
 }
