@@ -3,7 +3,6 @@ package com.abielinski.lsd;
 
 import java.util.ArrayList;
 
-import com.abielinski.lsd.basic.PlatformerPlayer;
 import com.abielinski.lsd.util.Rectangle;
 
 import processing.core.PApplet;
@@ -244,9 +243,14 @@ public class LSDTileMap extends LSDSprite {
 		    return hulls;
 		}
 		hulls.clear();
-		//int spriteTileX = (int) Math.floor((sprite.pos.x - this.pos.x)/_tileWidth);
-		//int spriteTileY = (int) Math.floor((sprite.pos.y - this.pos.y)/_tileHeight);
+		int spriteTileX = (int) Math.floor((sprite.pos.x - this.pos.x)/_tileWidth);
+		int spriteTileY = (int) Math.floor((sprite.pos.y - this.pos.y)/_tileHeight);
+		int spriteTileWidth = spriteTileX + (int) Math.ceil(sprite.w/_tileWidth)+1;
+		int spriteTileHeight = spriteTileY + (int) Math.ceil(sprite.h/_tileHeight)+1;
 		
+		if(spriteTileX < 0){
+			spriteTileX = 0;
+		}
 		
 		return hulls;
 	}
@@ -321,22 +325,18 @@ public class LSDTileMap extends LSDSprite {
 	 */
 	public ArrayList<Object> replaceTilesByIndex(int Index, String className){
 		ArrayList<Object> _group = new ArrayList<Object>();
-		//TODO: locate tiles
 		for(int i = 0; i< widthInTiles*heightInTiles;i++){
 			if(getTileByIndex(i)==Index){
 				LSDSprite newObject;
 				try{
 					newObject= (LSDSprite)Class.forName(className).newInstance();
 				}catch (InstantiationException e){
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					continue;
 				}catch (IllegalAccessException e){
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					continue;
 				}catch (ClassNotFoundException e){
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					continue;
 				}
