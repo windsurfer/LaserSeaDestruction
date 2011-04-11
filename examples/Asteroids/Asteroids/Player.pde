@@ -30,6 +30,7 @@ class Player extends LSDSprite{
    drag.x = 0.03;
     drag.y = 0.03;
     accel.y = 0.0;
+    fixed = false;
 //   onGround = false;
    
   }

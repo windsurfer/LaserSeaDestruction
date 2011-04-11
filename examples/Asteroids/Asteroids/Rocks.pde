@@ -28,7 +28,7 @@ class Rocks extends LSDSprite{
    accel.x = random(-0.002,0.002);
    accel.y = random(-0.002,0.002);
 
-   
+   fixed = false;
   }
   
   void run(){
