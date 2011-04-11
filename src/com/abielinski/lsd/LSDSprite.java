@@ -398,8 +398,16 @@ public class LSDSprite extends Rectangle {
 		vel.mult(-1);
 	}
 	/**
+	 * Bumps the player forward, based on <code>angle</code>
+	 * @param force The force applied
+	 */
+	public void bumpForward(float force){
+		vel.x+= (force/mass)*Math.sin(angle)*LSDG.frameTime();
+		vel.y+= (force/mass)*Math.cos(angle)*LSDG.frameTime();
+	}
+	/**
 	 * Tries to bump an object based on point p. Probably buggy.
-	 * @param p
+	 * @param p The position that we're bumping from 
 	 */
 	public void bumpFrom(PVector p){
 		// ANGLES ARE WRONG
