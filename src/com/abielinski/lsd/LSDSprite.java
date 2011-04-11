@@ -97,6 +97,17 @@ public class LSDSprite extends Rectangle {
 	 */
 	public LSDAnimation newAnimation;
 	
+	/**
+	* The width of the actual graphic or image being displayed (not necessarily the game object/bounding box).
+	* NOTE: Edit at your own risk!! This is intended to be read-only.
+	*/
+	public int frameWidth; // TODO: DO THIS
+	/**
+	* The height of the actual graphic or image being displayed (not necessarily the game object/bounding box).
+	* NOTE: Edit at your own risk!! This is intended to be read-only.
+	*/
+	public int frameHeight; // TODO: DO THIS
+	
 	
 	/**
 	 * Whether this object is solid and can collide
@@ -276,8 +287,8 @@ public class LSDSprite extends Rectangle {
 	 */
 	public void draw() {
 		LSDG.theParent.pushMatrix();
-			LSDG.theParent.rotate(angle);
 			LSDG.theParent.translate(pos.x,pos.y);
+			LSDG.theParent.rotate(angle);
 			LSDG.theParent.imageMode(PApplet.CENTER);
 			if (frames != null){
 				if(flip){
@@ -473,13 +484,35 @@ public class LSDSprite extends Rectangle {
 	
 	/**
 	 * This is called when the object is overlapping something. Override this if you want different functionality from dying.
+	 * If you want to check for a collision, use <code>LSDG.collide()</code>
 	 * @param Object1 the first object
 	 * @param Object2 the second object
 	 * @return whether this is overlapping
 	 */
 	public boolean overlapping(LSDSprite Object1,LSDSprite Object2){
 		
-		return true;
+		return false;
 	}
 	
+	/**
+	 * Whether this sprite is overlapping another, using width and height
+	 * @param Obj The object to overlap
+	 * @return whether they overlap
+	 */
+	public boolean overlaps(LSDSprite Obj){
+		float tx = pos.x;
+		float ty = pos.y;
+		float tw = w;
+		float th = h;
+		float ox = Obj.pos.x;
+		float oy = Obj.pos.y;
+		float ow = Obj.w;
+		float oh = Obj.h;
+		if((ox <= tx-ow) || (ox >= tx+tw) || (oy <= ty-oh) || (oy >= ty+th)){
+			return false;
+		}
+		return true;
+	}
+
+
 }
