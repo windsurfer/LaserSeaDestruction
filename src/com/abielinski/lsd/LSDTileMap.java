@@ -251,6 +251,7 @@ public class LSDTileMap extends LSDSprite {
 		if(spriteTileX < 0){
 			spriteTileX = 0;
 		}
+		// TODO: Finish this
 		
 		return hulls;
 	}

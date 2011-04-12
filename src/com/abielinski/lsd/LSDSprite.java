@@ -288,7 +288,9 @@ public class LSDSprite extends Rectangle {
 	public void draw() {
 		LSDG.theParent.pushMatrix();
 			LSDG.theParent.translate(pos.x,pos.y);
-			LSDG.theParent.rotate(angle);
+			if (angle < -LSDG.roundingError || angle > LSDG.roundingError){
+				LSDG.theParent.rotate(angle);
+			}
 			LSDG.theParent.imageMode(PApplet.CENTER);
 			if (frames != null){
 				if(flip){
@@ -402,8 +404,8 @@ public class LSDSprite extends Rectangle {
 	 * @param force The force applied
 	 */
 	public void bumpForward(float force){
-		vel.x+= (force/mass)*Math.sin(angle)*LSDG.frameTime();
-		vel.y+= (force/mass)*Math.cos(angle)*LSDG.frameTime();
+		vel.x+= (force/mass)*Math.cos(angle)*LSDG.frameTime();
+		vel.y+= (force/mass)*Math.sin(angle)*LSDG.frameTime();
 	}
 	/**
 	 * Tries to bump an object based on point p. Probably buggy.
