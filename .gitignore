@@ -3,3 +3,4 @@ tmp/*
 doc/*
 distribution/*
 *.class
+*Thumbs.db
