@@ -31,6 +31,9 @@ class Rocks extends LSDSprite{
    if(pos.x < 0)pos.x = width;
    if(pos.x > width)pos.x = 0;
   } 
-  
+    void collide(LSDSprite me, LSDSprite anything){
+    //this.kill();
+    rocks.remove(me); // won't remove if it's not part of rocks
+  }
   
 }

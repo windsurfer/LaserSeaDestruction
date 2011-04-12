@@ -22,12 +22,20 @@ public class LSDContainer extends LSDSprite {
 	 */
 	public ArrayList<LSDSprite>	toAdd;
 	
-	LSDContainer() {
+	/**
+	 * Creates a new LSDContainer
+	 */
+	public LSDContainer() {
 		super();
 		init(0, 0);
 	}
 	
-	LSDContainer(float x, float y) {
+	/**
+	 * Creates a new LSDContainer at x,y
+	 * @param x
+	 * @param y
+	 */
+	public LSDContainer(float x, float y) {
 		super();
 		init(x, y);
 	}

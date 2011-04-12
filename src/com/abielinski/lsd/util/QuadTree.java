@@ -426,6 +426,8 @@ public class QuadTree extends Rectangle {
 					itr = itr.next;
 					continue;
 				}
+				co.collide(co, _o);
+				_o.collide(_o, co);
 				if(co.overlapping(_o,co))
 					c = true;
 				itr = itr.next;

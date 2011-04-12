@@ -262,8 +262,10 @@ public class LSDG {
 		Rectangle obj2Hull = Object2.colHullX;
 		//ArrayList co1 = Object1.colOffsets;
 		//ArrayList co2 = Object2.colOffsets;
-		int l1 = 1;
-		int l2 = 1;
+		ArrayList<Rectangle> co1 = Object1.hulls;
+		ArrayList<Rectangle> co2 = Object2.hulls;
+		int l1 = co1.size();
+		int l2 = co2.size();
 		float ox1;
 		float oy1;
 		float ox2;
@@ -575,8 +577,6 @@ public class LSDG {
 			obj1Hull.pos.x -= ox1;
 			obj1Hull.pos.y -= oy1;
 	}
-
-		PApplet.println("Collision? " + hit);
 	return hit;
 	}
 	

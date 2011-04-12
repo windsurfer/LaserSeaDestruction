@@ -3,6 +3,7 @@ package com.abielinski.lsd;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.abielinski.lsd.util.CollisionCallback;
 import com.abielinski.lsd.util.Rectangle;
 
 import processing.core.PApplet;
@@ -14,7 +15,8 @@ import processing.core.PVector;
  * @author Adam and Nik
  *
  */
-public class LSDSprite extends Rectangle {
+public class LSDSprite extends Rectangle 
+	implements CollisionCallback{
 	/**
 	 * The previous position of the sprite
 	 */
@@ -123,6 +125,8 @@ public class LSDSprite extends Rectangle {
 	 * Whether the object is on the floor (only useful for platformers, really)
 	 */
 	public boolean onFloor;
+	
+	
 	
 	/**
 	 * Uses defaults and places sprite at 0,0
@@ -494,7 +498,7 @@ public class LSDSprite extends Rectangle {
 	
 	
 	/**
-	 * TODO: make this work
+	 * TODO: make this work ( I don't think it ever will without a graphics pipeline rework)
 	 * @param p
 	 */
 	public void getScreenXY(PVector p){
@@ -511,7 +515,7 @@ public class LSDSprite extends Rectangle {
 	 */
 	public boolean overlapping(LSDSprite Object1,LSDSprite Object2){
 		
-		return false;
+		return true;
 	}
 	
 	/**
@@ -532,6 +536,16 @@ public class LSDSprite extends Rectangle {
 			return false;
 		}
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.abielinski.lsd.util.CollisionCallback#collide(com.abielinski.lsd.LSDSprite, com.abielinski.lsd.LSDSprite)
+	 */
+	@Override
+	public void collide(LSDSprite obj1, LSDSprite obj2) {
+		PApplet.println("I've detected a collision, but I haven't done anything about it.");
+		PApplet.println("in " + this.getClass().getName() );
+		
 	}
 
 

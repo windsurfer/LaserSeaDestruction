@@ -15,11 +15,18 @@ class Bullet extends LSDSprite{
   void run(){
     super.run();
     life-=LSDG.frameTime();
-    if (life <0){
+    if (life <=0){
       bullets.remove(this);
     }
   }
-      
   
+  void kill(){
+    life = -1.0;
+  }
   
+  void collide(LSDSprite me, LSDSprite anything){
+    this.kill();
+    rocks.remove(me); // won't remove if it's not part of rocks
+    rocks.remove(anything); // won't remove if it's not part of rocks
+  }
 }
