@@ -1,7 +1,7 @@
 class Maingame extends LSDGame{
   
   public Maingame(){
-    
+    super();
   }
   
   void runRockCollide(){
@@ -9,11 +9,12 @@ class Maingame extends LSDGame{
        for(LSDSprite s:children){
          if(s.overlaps(children.get(i))){
            println("overlapping"); 
-           s.bump();
+           //s.bump();
             //children.get(i).bump();
          }
        }
      }
   } 
+  
   
 }

@@ -5,15 +5,12 @@ class Rocks extends LSDSprite{
   
   public Rocks(float xpos, float ypos){
      super(xpos,ypos);
-      colHullX = new Rectangle(xpos,ypos,50,50);
-     colHullY = new Rectangle(xpos,ypos,50,50);
-     init(); 
-     //vel.x = random(0.005,0.05);
-     //vel.y = random(0.005,0.05);
+     vel.x = random(0.005,0.05);
+     vel.y = random(0.005,0.05);
   }
   
   void init(){
- 
+   super.init();
    this.createGraphic(50,50,"rock.png");
    ArrayList<Integer> a = new ArrayList();
    a.add(0);
