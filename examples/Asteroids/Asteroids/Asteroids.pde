@@ -26,7 +26,7 @@ void setup(){
   
   mainGame.add(ship);
   for(Rocks r:rocks){
-  mainGame.add(r);
+    mainGame.add(r);
   }
   LSDG.game = mainGame;
 }

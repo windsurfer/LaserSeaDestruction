@@ -23,7 +23,7 @@ class Player extends LSDSprite{
    a = new ArrayList();
    a.add(1);
    a.add(2);
-   this.addAnimation("moving",2,a);
+   this.addAnimation("moving",12,a);
    setAnimation("idle");
    
    drag.x = 0.001;

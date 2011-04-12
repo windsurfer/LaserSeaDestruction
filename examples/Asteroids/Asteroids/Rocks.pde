@@ -5,8 +5,7 @@ class Rocks extends LSDSprite{
   
   public Rocks(float xpos, float ypos){
      super(xpos,ypos);
-     vel.x = random(0.005,0.05);
-     vel.y = random(0.005,0.05);
+     init();
   }
   
   void init(){
@@ -19,24 +18,18 @@ class Rocks extends LSDSprite{
   
    setAnimation("idle");
    
-   drag.x = 0.03;
-   drag.y = 0.03;
-   accel.x = random(-0.002,0.002);
-   accel.y = random(-0.002,0.002);
+   vel.x = random(-0.004,0.004);
+   vel.y = random(-0.004,0.004);
 
-   fixed = false;
   }
   
   void run(){
    super.run();
-  // println("player run");
+   //println("asteroids run");
    if(pos.y > height)pos.y = 0; 
    if(pos.y < 0)pos.y = height; 
    if(pos.x < 0)pos.x = width;
-   if(pos.y > width)pos.x = 0;
-   //println(controls.playerMap.get(index));
-  
-    
+   if(pos.x > width)pos.x = 0;
   } 
   
 }
