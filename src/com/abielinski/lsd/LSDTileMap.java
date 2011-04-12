@@ -237,6 +237,7 @@ public class LSDTileMap extends LSDSprite {
 	
 	
 	public ArrayList<Rectangle> getHulls(LSDSprite sprite){
+		//TODO: cache this somehow
 		if (sprite == null){
 			hulls.clear();
 			hulls.add(new Rectangle(0,0,w,h));
@@ -251,7 +252,24 @@ public class LSDTileMap extends LSDSprite {
 		if(spriteTileX < 0){
 			spriteTileX = 0;
 		}
-		// TODO: Finish this
+		if (spriteTileY< 0){
+			spriteTileY = 0;
+		}
+		if (spriteTileWidth > widthInTiles){
+			spriteTileWidth = widthInTiles;
+		}
+		if (spriteTileHeight > heightInTiles){
+			spriteTileHeight = heightInTiles;
+		}
+		int rs = spriteTileY*widthInTiles;
+		for(int r = spriteTileY; r < spriteTileHeight; r++){
+			for(int c = spriteTileX; c < spriteTileWidth; c++){
+				if(_data.get(rs+c) >= collideIndex){
+					hulls.add(new Rectangle(pos.x+c*_tileWidth, pos.y+r*_tileHeight, this.w, this.h));
+				}
+			}
+			rs += widthInTiles;
+		}
 		
 		return hulls;
 	}

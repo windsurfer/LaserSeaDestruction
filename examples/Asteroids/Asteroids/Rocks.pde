@@ -10,7 +10,6 @@ class Rocks extends LSDSprite{
   }
   
   void init(){
-   super.init();
    this.createGraphic(50,50,"rock.png");
    ArrayList<Integer> a = new ArrayList();
    a.add(0);

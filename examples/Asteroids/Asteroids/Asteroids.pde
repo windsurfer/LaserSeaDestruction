@@ -35,6 +35,7 @@ void draw(){
   
   background(20);
   LSDG.update();  
+  line(0,0,0,0);
   //mainGame.runRockCollide();
   
 }

@@ -2,8 +2,8 @@ class Player extends LSDSprite{
  
   int index;
   float slowDown;
-  float thrust = 0.0001;
-  float rotation = 0.003;
+  float thrust = 0.0005;
+  float rotation = 0.005;
   
   public Player(float xpos, float ypos){
      super(xpos,ypos);
@@ -26,8 +26,8 @@ class Player extends LSDSprite{
    this.addAnimation("moving",2,a);
    setAnimation("idle");
    
-   //drag.x = 0.03;
-   // drag.y = 0.03;
+   drag.x = 0.001;
+   drag.y = 0.001;
     accel.y = 0.0;
     accel.x = 0.0;
 //   onGround = false;
@@ -39,21 +39,18 @@ class Player extends LSDSprite{
    if(pos.y > height)pos.y = 0; 
    if(pos.y < 0)pos.y = height; 
    if(pos.x < 0)pos.x = width;
-   if(pos.y > width)pos.x = 0;
+   if(pos.x > width)pos.x = 0;
    
    if (LSDG.keys(LEFT)){
-     angle += rotation*LSDG.frameTime(); 
-   }else if (LSDG.keys(RIGHT)){
      angle -= rotation*LSDG.frameTime(); 
+   }else if (LSDG.keys(RIGHT)){
+     angle += rotation*LSDG.frameTime(); 
    }
-    drag.x = 0.0;
-    drag.y = 0.0;
     if(LSDG.keys(UP)){
-      bumpForward(thrust);
+      bumpAtAngle(thrust,-PI/2.0);
       setAnimation("moving");
     }else if (LSDG.keys(DOWN)){
-      drag.x = 0.1;
-      drag.y = 0.1;
+      bumpAtAngle(thrust,PI/2.0);
     }else{
       setAnimation("idle");
     }

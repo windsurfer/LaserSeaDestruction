@@ -407,6 +407,16 @@ public class LSDSprite extends Rectangle {
 		vel.x+= (force/mass)*Math.cos(angle)*LSDG.frameTime();
 		vel.y+= (force/mass)*Math.sin(angle)*LSDG.frameTime();
 	}
+	
+	/**
+	 * Bumps the player forward, based on <code>angle</code> and a supplied angle.
+	 * @param force The force applied
+	 * @param _angle The angle you wish to bump this at
+	 */
+	public void bumpAtAngle(float force, float _angle){
+		vel.x+= (force/mass)*Math.cos(angle+_angle)*LSDG.frameTime();
+		vel.y+= (force/mass)*Math.sin(angle+_angle)*LSDG.frameTime();
+	}
 	/**
 	 * Tries to bump an object based on point p. Probably buggy.
 	 * @param p The position that we're bumping from 
