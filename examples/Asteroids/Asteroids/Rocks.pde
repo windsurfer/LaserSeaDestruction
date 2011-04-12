@@ -32,4 +32,5 @@ class Rocks extends LSDSprite{
    if(pos.x > width)pos.x = 0;
   } 
   
+  
 }

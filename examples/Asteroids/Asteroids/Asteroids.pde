@@ -3,14 +3,14 @@ import com.abielinski.lsd.*;
 import com.abielinski.lsd.basic.*;
 
 Player ship;
-ArrayList<Rocks> rocks;
+LSDContainer rocks;
 LSDG lsd;
 Maingame mainGame;
 int enemyNumber;
 Rocks rock;
 
 
-float bulletSpeed = 0.2;
+float bulletSpeed = 0.4;
 LSDContainer bullets;
 
 void setup(){
@@ -22,7 +22,7 @@ void setup(){
   enemyNumber = 10;
   mainGame = new Maingame();
   mainGame.init();
-  rocks = new ArrayList<Rocks>();
+  rocks = new LSDContainer();
   for(int i =0;i<enemyNumber;i++){
     rocks.add(rock = new Rocks(random(0,width),random(0,height))); 
   }
@@ -30,9 +30,8 @@ void setup(){
   ship = new Player(width/2,height/2);
   
   mainGame.add(ship);
-  for(Rocks r:rocks){
-    mainGame.add(r);
-  }
+  mainGame.add(rocks);
+
   
   bullets = new LSDContainer();
   mainGame.add(bullets);
@@ -43,9 +42,10 @@ void setup(){
 void draw(){
   
   background(20);
-  LSDG.update();  
-  line(0,0,0,0);
-  //mainGame.runRockCollide();
+  LSDG.update();
+  if(LSDG.collide(bullets, rocks)){
+    println("Something hit");
+  }
   
 }
 
