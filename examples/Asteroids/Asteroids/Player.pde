@@ -5,6 +5,9 @@ class Player extends LSDSprite{
   float thrust = 0.0005;
   float rotation = 0.005;
   
+  
+  float shotTimer;
+  
   public Player(float xpos, float ypos){
      super(xpos,ypos);
      index = 1;
@@ -30,7 +33,7 @@ class Player extends LSDSprite{
    drag.y = 0.001;
     accel.y = 0.0;
     accel.x = 0.0;
-//   onGround = false;
+   shotTimer = 0.0;
    
   }
   
@@ -43,7 +46,8 @@ class Player extends LSDSprite{
    
    if (LSDG.keys(LEFT)){
      angle -= rotation*LSDG.frameTime(); 
-   }else if (LSDG.keys(RIGHT)){
+   }
+   if (LSDG.keys(RIGHT)){
      angle += rotation*LSDG.frameTime(); 
    }
     if(LSDG.keys(UP)){
@@ -55,8 +59,13 @@ class Player extends LSDSprite{
       setAnimation("idle");
     }
     
-    if(LSDG.keys(' ')){
+    if(LSDG.keys(' ') && shotTimer <= 0){
       println("bang");
+      fireBullet(pos,
+        new PVector(cos(angle-PI/2.0), sin(angle-PI/2.0)));
+      shotTimer = 150.0;
+    }else if (shotTimer >0){
+      shotTimer-=LSDG.frameTime();
     }
     
     

@@ -8,6 +8,11 @@ LSDG lsd;
 Maingame mainGame;
 int enemyNumber;
 Rocks rock;
+
+
+float bulletSpeed = 0.2;
+LSDContainer bullets;
+
 void setup(){
   
   size(600,400);
@@ -28,6 +33,10 @@ void setup(){
   for(Rocks r:rocks){
     mainGame.add(r);
   }
+  
+  bullets = new LSDContainer();
+  mainGame.add(bullets);
+  
   LSDG.game = mainGame;
 }
 
@@ -39,6 +48,18 @@ void draw(){
   //mainGame.runRockCollide();
   
 }
+
+void fireBullet(PVector _pos, PVector _dir){
+    if (bullets == null){
+      bullets = new LSDContainer();
+    }
+    PVector direction = _dir.get();
+    direction.normalize();
+    direction.mult(bulletSpeed);
+    Bullet bul = new Bullet(_pos.x, _pos.y);
+    bul.vel = direction;
+    bullets.add(bul);
+  }
 
 void keyPressed(){
   if (key == CODED) {
