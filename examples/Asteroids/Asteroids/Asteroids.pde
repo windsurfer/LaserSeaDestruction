@@ -1,3 +1,10 @@
+/**
+* Written by Nik
+  Debugged by Adam
+*
+*/
+
+
 import com.abielinski.lsd.util.*;
 import com.abielinski.lsd.*;
 import com.abielinski.lsd.basic.*;
@@ -45,6 +52,9 @@ void draw(){
   LSDG.update();
   if(LSDG.collide(bullets, rocks)){
     println("Something hit");
+  }
+  if(LSDG.collide(ship,rocks)){
+    println("Shields up Mr Sulu") ;
   }
   
 }
