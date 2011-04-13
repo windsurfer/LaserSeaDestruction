@@ -31,17 +31,19 @@ public class Platformer extends LSDGame {
 	/**
 	 * The width of this game
 	 */
-	public final int gameWidth = 455;
+	public final int gameWidth = 600;
 	
 	/**
 	 * The height of this game
 	 */
-	public final int gameHeight = 168;
+	public final int gameHeight = 268;
 	
 	
 	protected PlatformerLevel level1;
 	
 	protected PlatformerPlayer player;
+	
+	protected PlatformerPlatform platform;
 	
 	
 	/**
@@ -58,9 +60,10 @@ public class Platformer extends LSDGame {
 	 */
 	public void init(){
 		super.init();
-		
+		//LSDG.showHulls = true;
 		
 		level1 = new PlatformerLevel();
+		
 		level1.collisionMap= new LSDTileMap(); 
 		level1.collisionMap.createGraphic(16,16,"basicPlatformerTiles.PNG");
 		level1.collisionMap.loadRows(level1_rows);
@@ -73,6 +76,10 @@ public class Platformer extends LSDGame {
 		
 		this.add(player);
 		
+		platform = new PlatformerPlatform(128, 192);
+		
+		this.add(platform);
+		
 	}
 	
 	public void draw(){
@@ -81,7 +88,8 @@ public class Platformer extends LSDGame {
 	
 	public void run(){
 		super.run();
-		LSDG.collide(player, level1);
+		LSDG.collide(player, level1.collisionMap);
+		LSDG.collide(player, platform);
 		if (player.pos.y > LSDG.theParent.height){
 			player.pos.y = LSDG.theParent.height;
 			player.vel.y = -0.1f;

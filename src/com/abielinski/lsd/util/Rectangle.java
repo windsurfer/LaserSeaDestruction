@@ -60,4 +60,12 @@ public class Rectangle {
 	public PVector bottomRight(){
 		return new PVector(pos.x+w,pos.y+h);
 	}
+
+	/**
+	 * @return a copy of this rectangle
+	 */
+	public Rectangle get() {
+		// TODO Auto-generated method stub
+		return new Rectangle(this.pos.x, this.pos.y, this.w, this.h);
+	}
 }

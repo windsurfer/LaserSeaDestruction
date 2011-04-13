@@ -21,6 +21,13 @@ public class LSDSprite extends Rectangle
 	 * The previous position of the sprite
 	 */
 	protected PVector prevPos;
+	
+	
+	/**
+	 * The difference from the last frame
+	 */
+	public PVector diffVector;
+	
 	/**
 	 * The velocity of the sprite in x, y, and z
 	 */
@@ -156,6 +163,7 @@ public class LSDSprite extends Rectangle
 	private void construct() {
 		pos = new PVector();
 		prevPos = new PVector();
+		diffVector = new PVector();
 		vel = new PVector();
 		accel = new PVector();
 		drag = new PVector(0.0f, 0.0f); //  we're in outer space!
@@ -264,20 +272,36 @@ public class LSDSprite extends Rectangle
 	 */
 	public  void run() {
 		prevPos = pos.get();
+		if (solid)
+			refreshHulls();
 		if (!fixed){
 			pos.x += vel.x*LSDG.frameTime();
 			pos.y += vel.y*LSDG.frameTime();
 			
-	
+
+			diffVector.x = vel.x;
+			diffVector.y = vel.y;
 			vel.x+= accel.x*LSDG.frameTime();
 			vel.y+= accel.y*LSDG.frameTime();
 			vel.x /= (drag.x*LSDG.frameTime()+1);
 			vel.y /= (drag.y*LSDG.frameTime()+1);
+			
+
+			diffVector.x = vel.x - diffVector.x;
+			diffVector.x /= 2.0;
+			diffVector.y = vel.y - diffVector.y;
+			diffVector.y /= 2.0;
+			
 		}
 		
-		if(solid)
-			 refreshHulls();
+		colHullX.w += ((diffVector.x > 0) ? diffVector.x : -diffVector.x);
+		if (diffVector.x < 0)
+			colHullX.pos.x += diffVector.x;
+		colHullY.pos.x = pos.x;
 		
+		colHullY.h += ((diffVector.y > 0) ? diffVector.y : -diffVector.y);
+		if (diffVector.y < 0)
+			colHullY.pos.y += diffVector.y;
 		// you need to draw later
 		curAnimationTime += LSDG.frameTime(); // time since last frame
 		if (newAnimation!=curAnimation){
@@ -313,18 +337,15 @@ public class LSDSprite extends Rectangle
 	 * Refreshes the hulls used for physics calculations based on the sprite as it was loaded.
 	 */
 	public void refreshHulls(){
-		colHullX.pos.x = pos.x-w/2.0f;
-		colHullX.pos.y = pos.y-h/2.0f;
+		colHullX.pos.x = pos.x;
+		colHullX.pos.y = pos.y;
 		colHullX.w = w;
 		colHullX.h = h;
-		colHullY.pos.x = pos.x-w/2.0f;
-		colHullY.pos.y = pos.y-h/2.0f;
+		colHullY.pos.x = pos.x;
+		colHullY.pos.y = pos.y;
 		colHullY.w = w;
 		colHullY.h = h;
 		
-		// new code not from flixel
-		hulls.clear();
-		hulls.add(colHullX);
 	}
 	
 	
@@ -491,8 +512,9 @@ public class LSDSprite extends Rectangle
 	 */
 	public void hitBottom(LSDSprite Contact,float Velocity){
 		onFloor = true;
-		if(!fixed)
+		if(!fixed){
 			vel.y = Velocity;
+		}
 	}
 	
 	
@@ -502,8 +524,8 @@ public class LSDSprite extends Rectangle
 	 * @param p
 	 */
 	public void getScreenXY(PVector p){
-		p.x = 0;
-		p.y = 0;
+		p.x = pos.x;
+		p.y = pos.y;
 	}
 	
 	/**

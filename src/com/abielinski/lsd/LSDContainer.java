@@ -45,6 +45,8 @@ public class LSDContainer extends LSDSprite {
 		this.pos.y = y;
 		//angle = 0;
 		//zoom = 1.0f;
+
+		fixed = true;
 		children = new ArrayList<LSDSprite>();
 		toDelete = new ArrayList<LSDSprite>();
 		toAdd = new ArrayList<LSDSprite>();

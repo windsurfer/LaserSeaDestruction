@@ -52,7 +52,7 @@ public class BitmapLevel extends LSDLevel {
 	 */
 	public BitmapLevel() {
 		// put in the middle of the screen
-		super(LSDG.theParent.width/2,LSDG.theParent.height/2);
+		super();
 		this.w = LSDG.theParent.width;
 		this.h = LSDG.theParent.height;
 		
@@ -68,7 +68,7 @@ public class BitmapLevel extends LSDLevel {
 	 */
 	public BitmapLevel(int wi, int he) {
 		// put in the middle of the screen
-		super(wi/2,he/2);
+		super();
 		//this.w = wi;
 		//this.h = he;
 		widthNum = wi;
@@ -135,7 +135,8 @@ public class BitmapLevel extends LSDLevel {
 		}
 	}
 	
-	public boolean collide(int i, int j){
+	
+	public boolean collision(int i, int j){
 		if (i<0 || i> w-1 || j<0 || j>h-1){
 			return true; //out of bounds is a collision
 		}

@@ -175,10 +175,10 @@ public class QuadTree extends Rectangle {
 					}else if(m.solid)
 					{
 						_o = m;
-						_ol = _o.pos.x;
-						_ot = _o.pos.y;
-						_or = _o.pos.x + _o.w;
-						_ob = _o.pos.y + _o.h;
+						_ol = _o.pos.x - _o.w/2.0f;
+						_ot = _o.pos.y - _o.h/2.0f;
+						_or = _o.pos.x + _o.w/2.0f;
+						_ob = _o.pos.y + _o.h/2.0f;
 						addObject();
 					}
 				}
@@ -189,10 +189,10 @@ public class QuadTree extends Rectangle {
 		if(Obj.solid)
 		{
 			_o = Obj;
-			_ol = _o.pos.x;
-			_ot = _o.pos.y;
-			_or = _o.pos.x + _o.w;
-			_ob = _o.pos.y + _o.h;
+			_ol = _o.pos.x - _o.w/2.0f;
+			_ot = _o.pos.y - _o.h/2.0f;
+			_or = _o.pos.x + _o.w/2.0f;
+			_ob = _o.pos.y + _o.h/2.0f;
 			addObject();
 		}
 	}
@@ -316,10 +316,11 @@ public class QuadTree extends Rectangle {
 	 * using <code>QuadTree.add()</code> to compare the objects that you loaded.
 	 * 
 	 * @param	BothLists	Whether you are doing an A-B list comparison, or comparing A against itself.
+	 * @param yCollision Whether we should be doing a yCollision
 	 *
 	 * @return	Whether or not any overlaps were found.
 	 */
-	public Boolean overlap(boolean BothLists) 
+	public Boolean overlap(boolean BothLists, boolean yCollision) 
 	{
 		Boolean c = false;
 		LSDList itr;
@@ -333,7 +334,7 @@ public class QuadTree extends Rectangle {
 				while(itr != null)
 				{
 					_o = itr.object;
-					if( _o.solid && overlapNode(null))
+					if( _o.solid && overlapNode(null, yCollision))
 						c = true;
 					itr = itr.next;
 				}
@@ -347,13 +348,13 @@ public class QuadTree extends Rectangle {
 					_o = itr.object;
 					if( _o.solid)
 					{
-						if((_nw != null) && _nw.overlapNode(null))
+						if((_nw != null) && _nw.overlapNode(null,yCollision))
 							c = true;
-						if((_ne != null) && _ne.overlapNode(null))
+						if((_ne != null) && _ne.overlapNode(null,yCollision))
 							c = true;
-						if((_se != null) && _se.overlapNode(null))
+						if((_se != null) && _se.overlapNode(null,yCollision))
 							c = true;
-						if((_sw != null) && _sw.overlapNode(null))
+						if((_sw != null) && _sw.overlapNode(null,yCollision))
 							c = true;
 					}
 					itr = itr.next;
@@ -369,7 +370,7 @@ public class QuadTree extends Rectangle {
 				while(itr != null)
 				{
 					_o = itr.object;
-					if(_o.solid && overlapNode(itr.next))
+					if(_o.solid && overlapNode(itr.next,yCollision))
 						c = true;
 					itr = itr.next;
 				}
@@ -377,13 +378,13 @@ public class QuadTree extends Rectangle {
 		}
 		
 		//Advance through the tree by calling overlap on each child
-		if((_nw != null) && _nw.overlap(BothLists))
+		if((_nw != null) && _nw.overlap(BothLists,yCollision))
 			c = true;
-		if((_ne != null) && _ne.overlap(BothLists))
+		if((_ne != null) && _ne.overlap(BothLists,yCollision))
 			c = true;
-		if((_se != null) && _se.overlap(BothLists))
+		if((_se != null) && _se.overlap(BothLists,yCollision))
 			c = true;
-		if((_sw != null) && _sw.overlap(BothLists))
+		if((_sw != null) && _sw.overlap(BothLists,yCollision))
 			c = true;
 		
 		return c;
@@ -396,7 +397,7 @@ public class QuadTree extends Rectangle {
 	 * 
 	 * @return	Whether or not any overlaps were found.
 	 */
-	protected Boolean overlapNode(LSDList Iterator) 
+	protected Boolean overlapNode(LSDList Iterator,boolean yCollision) 
 	{
 		//member list setup
 		Boolean c = false;
@@ -428,8 +429,13 @@ public class QuadTree extends Rectangle {
 				}
 				co.collide(co, _o);
 				_o.collide(_o, co);
-				if(co.overlapping(_o,co))
-					c = true;
+				if (yCollision){
+					if(LSDG.solveYCollision(_o,co))
+						c = true;
+				}else{
+					if(LSDG.solveXCollision(_o,co))
+						c = true;
+				}
 				itr = itr.next;
 			}
 		}

@@ -56,6 +56,12 @@ public class LSDG {
 	 */
 	public static HashMap<String, ArrayList<PImage>>	cachedFrames	= new HashMap<String, ArrayList<PImage>>();
 	
+	
+	/**
+	 * Whether to (hackishly) draw the collision hulls. Will be drawn during the run() step!!
+	 */
+	public static boolean showHulls	= false;
+	
 	/**
 	 * Initializes the library. This is required to happen before pretty much everything else.
 	 * @param _theParent a reference to the PApplet instance.
@@ -91,8 +97,14 @@ public class LSDG {
 		long currentTime = System.currentTimeMillis();
 		currentFrameTime = currentTime - lastFrame;
 		lastFrame = currentTime;
-		LSDG.run();
-		LSDG.draw();
+		if (showHulls){
+			// if we're drawing hulls, run after drawing!
+			LSDG.draw();
+			LSDG.run();
+		}else{
+			LSDG.run();
+			LSDG.draw();
+		}
 	}
 	
 	
@@ -218,10 +230,8 @@ public class LSDG {
 		if(!match){
 			quadTree.add(Object2,QuadTree.B_LIST);
 		}
-		boolean cx = quadTree.overlap(!match);
-		 if(cx){ solveXCollision(Object1, Object2);}
-		boolean cy = quadTree.overlap(!match);
-		 if(cy){ solveYCollision(Object1, Object2);}
+		boolean cx = quadTree.overlap(!match, false);
+		boolean cy = quadTree.overlap(!match, true);
 		return cx || cy;
 	}
 	
@@ -235,9 +245,11 @@ public class LSDG {
 	 * @return Whether it collides
 	 */
 	static public boolean solveXCollision(LSDSprite Object1,LSDSprite Object2){
+		
+		
 		//Avoid messed up collisions ahead of time
-		float o1 = Object1.vel.x;
-		float o2 = Object2.vel.x;
+		float o1 = Object1.diffVector.x;
+		float o2 = Object2.diffVector.x;
 		if(o1 == o2){
 			return false;
 		}
@@ -258,12 +270,12 @@ public class LSDG {
 		//Offset loop variables
 		int i1;
 		int i2;
-		Rectangle obj1Hull = Object1.colHullX;
-		Rectangle obj2Hull = Object2.colHullX;
+		Rectangle obj1Hull = Object1.colHullX.get();
+		Rectangle obj2Hull = Object2.colHullX.get();
 		//ArrayList co1 = Object1.colOffsets;
 		//ArrayList co2 = Object2.colOffsets;
-		ArrayList<Rectangle> co1 = Object1.hulls;
-		ArrayList<Rectangle> co2 = Object2.hulls;
+		ArrayList<Rectangle> co1 = Object1.getHulls(Object2); //get the hulls that are relevant to object2
+		ArrayList<Rectangle> co2 = Object2.getHulls(Object1);
 		int l1 = co1.size();
 		int l2 = co2.size();
 		float ox1;
@@ -281,27 +293,46 @@ public class LSDG {
 				(obj1MovePos && obj2MovePos && (((o1>0)?o1:-o1) > ((o2>0)?o2:-o2))) ); //both moving right, obj1 overtakes obj2
 		
 		
-		
 		//this looks insane, but we're just looping through collision offsets on each object
 		for(i1 = 0; i1 < l1; i1++)
 		{
-			ox1 = 0;
-			oy1 = 0;
+			ox1 = co1.get(i1).pos.x;
+			oy1 = co1.get(i1).pos.y;
 			obj1Hull.pos.x += ox1;
 			obj1Hull.pos.y += oy1;
+			//obj1Hull.w = co1.get(i1).w;
+			//obj1Hull.h = co1.get(i1).h;
+			
+			if(LSDG.showHulls){
+				LSDG.theParent.pushMatrix();
+					//LSDG.theParent.rectMode(PApplet.CENTER);
+					LSDG.theParent.fill(255,60,60,160);
+					LSDG.theParent.rect(obj1Hull.pos.x, obj1Hull.pos.y, obj1Hull.w, obj1Hull.h);
+				LSDG.theParent.popMatrix();
+			}
+			
 			for(i2 = 0; i2 < l2; i2++)
 			{
-				ox2 = 0;
-				oy2 = 0;
+				ox2 = co2.get(i2).pos.x;
+				oy2 = co2.get(i2).pos.y;
 				obj2Hull.pos.x += ox2;
 				obj2Hull.pos.y += oy2;
+				//obj2Hull.w = co2.get(i2).w;
+				//obj2Hull.h = co2.get(i2).h;
 				
+				if(LSDG.showHulls){
+					LSDG.theParent.pushMatrix();
+						//LSDG.theParent.rectMode(PApplet.CENTER);
+						LSDG.theParent.fill(60,60,255,160);
+						LSDG.theParent.rect(obj2Hull.pos.x, obj2Hull.pos.y, obj2Hull.w, obj2Hull.h);
+					LSDG.theParent.popMatrix();
+				}
 				//See if it's a actually a valid collision
-				if( (obj1Hull.pos.x + obj1Hull.w < obj2Hull.pos.x + roundingError) ||
-						(obj1Hull.pos.x + roundingError > obj2Hull.pos.x + obj2Hull.w) ||
-						(obj1Hull.pos.y + obj1Hull.h < obj2Hull.pos.y + roundingError) ||
-						(obj1Hull.pos.y + roundingError > obj2Hull.pos.y + obj2Hull.h) )
-				{
+				if 		  ((obj1Hull.pos.x + obj1Hull.w/2.0f < obj2Hull.pos.x - obj2Hull.w/2.0f + roundingError)
+						|| (obj1Hull.pos.x - obj1Hull.w/2.0f + roundingError > obj2Hull.pos.x + obj2Hull.w/2.0f)
+						|| (obj1Hull.pos.y + obj1Hull.h/2.0f < obj2Hull.pos.y - obj2Hull.h/2.0f + roundingError)
+						|| (obj1Hull.pos.y - obj1Hull.h/2.0f + roundingError > obj2Hull.pos.y + obj2Hull.h/2.0f)){
+					
 					obj2Hull.pos.x -= ox2;
 					obj2Hull.pos.y -= oy2;
 					continue;
@@ -377,7 +408,7 @@ public class LSDG {
 				if(!Object1.fixed && (overlap != 0))
 				{
 					if(p1hn2)
-						obj1Hull.w -= overlap;
+						obj1Hull.w -= overlap; //This code helps stuff ride horizontally moving platforms.
 					else
 					{
 						obj1Hull.pos.x -= overlap;
@@ -416,8 +447,8 @@ public class LSDG {
 	 */
 	static public boolean solveYCollision(LSDSprite Object1, LSDSprite Object2){
 		//Avoid messed up collisions ahead of time
-		float o1 = Object1.vel.y;
-		float o2 = Object2.vel.y;
+		float o1 = Object1.diffVector.y;
+		float o2 = Object2.diffVector.y;
 		if (o1 == o2)
 			return false;
 		
@@ -434,14 +465,17 @@ public class LSDG {
 		boolean obj2MoveNeg = o2 < 0;
 		boolean obj2MovePos = o2 > 0;
 		
+
+		
+		
 		// Offset loop variables
 		int i1;
 		int i2;
-		Rectangle obj1Hull = Object1.colHullY;
-		Rectangle obj2Hull = Object2.colHullY;
+		Rectangle obj1Hull = Object1.colHullY.get();
+		Rectangle obj2Hull = Object2.colHullY.get();
 		
-		ArrayList<Rectangle> co1 = Object1.hulls;
-		ArrayList<Rectangle> co2 = Object2.hulls;
+		ArrayList<Rectangle> co1 = Object1.getHulls(Object2);
+		ArrayList<Rectangle> co2 = Object2.getHulls(Object1);
 		
 		int l1 = co1.size();
 		int l2 = co2.size();
@@ -454,24 +488,15 @@ public class LSDG {
 		float sv1;
 		float sv2;
 		
-		// Decide based on object's movement patterns if it was a top or bottom
-		// collision
-		p1hn2 = ((obj1Stopped && obj2MoveNeg) || (obj1MovePos && obj2Stopped) || (obj1MovePos && obj2MoveNeg) || // the
-				// obvious
-				// cases
-				(obj1MoveNeg && obj2MoveNeg && (((o1 > 0) ? o1 : -o1) < ((o2 > 0) ? o2 : -o2))) || // both
-				// moving
-				// up,
-				// obj2
-				// overtakes
-				// obj1
-				(obj1MovePos && obj2MovePos && (((o1 > 0) ? o1 : -o1) > ((o2 > 0) ? o2 : -o2)))); // both
-		// moving
-		// down,
-		// obj1
-		// overtakes
-		// obj2
+		// Decide based on object's movement patterns if it was a top or bottom collision
+		p1hn2 = ((obj1Stopped && obj2MoveNeg) || (obj1MovePos && obj2Stopped) || (obj1MovePos && obj2MoveNeg) || // the obvious cases
+				(obj1MoveNeg && obj2MoveNeg && (((o1 > 0) ? o1 : -o1) < ((o2 > 0) ? o2 : -o2))) || // both moving up, obj2 overtakes  obj1
+				(obj1MovePos && obj2MovePos && (((o1 > 0) ? o1 : -o1) > ((o2 > 0) ? o2 : -o2)))); // both moving down, obj1 overtakes obj2
 		
+
+		if (!p1hn2){
+			PApplet.println("omg");
+		}
 		// this looks insane, but we're just looping through collision rectangles
 		// on each object
 		for (i1 = 0; i1 < l1; i1++){
@@ -479,25 +504,43 @@ public class LSDG {
 			oy1 = co1.get(i1).pos.y;
 			obj1Hull.pos.x += ox1;
 			obj1Hull.pos.y += oy1;
-			obj1Hull.w = co1.get(i1).w;
-			obj1Hull.h = co1.get(i1).h;
+			//obj1Hull.w = co1.get(i1).w;
+			//obj1Hull.h = co1.get(i1).h;
+			
+			if(LSDG.showHulls){
+				LSDG.theParent.pushMatrix();
+					//LSDG.theParent.rectMode(PApplet.CENTER);
+					LSDG.theParent.fill(255,60,60,160);
+					LSDG.theParent.rect(obj1Hull.pos.x, obj1Hull.pos.y, obj1Hull.w, obj1Hull.h);
+				LSDG.theParent.popMatrix();
+			}
+			
 			for (i2 = 0; i2 < l2; i2++){
 				ox2 = co2.get(i2).pos.x;
-				oy2 = co2.get(i2).pos.x;
+				oy2 = co2.get(i2).pos.y;
 				obj2Hull.pos.x += ox2;
 				obj2Hull.pos.y += oy2;
-				obj2Hull.w = co2.get(i2).w;
-				obj2Hull.h = co2.get(i2).h;
+				//obj2Hull.w = co2.get(i2).w;
+				//obj2Hull.h = co2.get(i2).h;
 				
+				if(LSDG.showHulls){
+					LSDG.theParent.pushMatrix();
+						//LSDG.theParent.rectMode(PApplet.CENTER);
+						LSDG.theParent.fill(255,60,60,160);
+						LSDG.theParent.rect(obj2Hull.pos.x, obj2Hull.pos.y, obj2Hull.w, obj2Hull.h);
+					LSDG.theParent.popMatrix();
+				}
 				// See if it's a actually a valid collision
-				if ((obj1Hull.pos.x + obj1Hull.w < obj2Hull.pos.x + roundingError)
-						|| (obj1Hull.pos.x + roundingError > obj2Hull.pos.x + obj2Hull.w)
-						|| (obj1Hull.pos.y + obj1Hull.h < obj2Hull.pos.y + roundingError)
-						|| (obj1Hull.pos.y + roundingError > obj2Hull.pos.y + obj2Hull.h)){
+				if 		  ((obj1Hull.pos.x + obj1Hull.w/2.0f < obj2Hull.pos.x - obj2Hull.w/2.0f + roundingError)
+						|| (obj1Hull.pos.x - obj1Hull.w/2.0f + roundingError > obj2Hull.pos.x + obj2Hull.w/2.0f)
+						|| (obj1Hull.pos.y + obj1Hull.h/2.0f < obj2Hull.pos.y - obj2Hull.h/2.0f + roundingError)
+						|| (obj1Hull.pos.y - obj1Hull.h/2.0f + roundingError > obj2Hull.pos.y + obj2Hull.h/2.0f)){
+					
 					obj2Hull.pos.x -= ox2;
 					obj2Hull.pos.y -= oy2;
 					continue;
 				}
+				
 				
 				// Calculate the overlap between the objects
 				if (p1hn2){
@@ -517,19 +560,20 @@ public class LSDG {
 					if (obj1MoveNeg)
 						r2 = -obj1Hull.pos.y;
 					else
-						r2 = -obj1Hull.pos.y - obj1Hull.h + Object1.colHullX.h;
+						r2 = -obj1Hull.pos.y - obj1Hull.h + Object1.colHullY.h;
 				}
 				overlap = r1 - r2;
-				
+
 				// Last chance to skip out on a bogus collision resolution
 				if ((overlap == 0) || ((!Object1.fixed && ((overlap > 0) ? overlap : -overlap) > obj1Hull.h * 0.8))
 						|| ((!Object2.fixed && ((overlap > 0) ? overlap : -overlap) > obj2Hull.h * 0.8))){
+					
 					obj2Hull.pos.x -= ox2;
 					obj2Hull.pos.y -= oy2;
 					continue;
 				}
 				hit = true;
-				
+
 				// Adjust the objects according to their flags and stuff
 				sv1 = Object2.vel.y;
 				sv2 = Object1.vel.y;
@@ -545,9 +589,11 @@ public class LSDG {
 					sv2 /= 2;
 				}
 				if (p1hn2){
+					PApplet.println("HitBottom");
 					Object1.hitBottom(Object2, sv1);
 					Object2.hitTop(Object1, sv2);
 				}else{
+					PApplet.println("HitTop");
 					Object1.hitTop(Object2, sv1);
 					Object2.hitBottom(Object1, sv2);
 				}
@@ -556,7 +602,13 @@ public class LSDG {
 				if (!Object1.fixed && (overlap != 0)){
 					if (p1hn2){
 						obj1Hull.pos.y -= overlap;
-						
+						if(Object2.fixed)
+						{
+							sv1 = Object2.diffVector.x;
+							Object1.pos.x += sv1;
+							obj1Hull.pos.x += sv1;
+							Object1.colHullX.pos.x += sv1;
+						}
 					}else{
 						obj1Hull.pos.y -= overlap;
 						obj1Hull.h += overlap;
@@ -568,6 +620,13 @@ public class LSDG {
 						obj2Hull.h -= overlap;
 					}else{
 						obj2Hull.h += overlap;
+						if(Object2.fixed)
+						{
+							sv2 = Object2.diffVector.x;
+							Object1.pos.x += sv2;
+							obj1Hull.pos.x += sv2;
+							Object1.colHullX.pos.x += sv2;
+						}
 						
 					}
 				}
@@ -616,7 +675,7 @@ public class LSDG {
 		;
 		for (int i = (int) area[0].x; i < (int) area[1].x; i++){
 			for (int j = (int) area[0].y; j < (int) area[1].y; j++){
-				if (level.collide(i, j)){
+				if (level.collision(i, j)){
 					points.add(new PVector(i, j));
 				}
 			}
@@ -741,7 +800,7 @@ public class LSDG {
 			i++;
 			laserNorm.normalize();
 			laserNorm.mult(i);
-			if (level.collide((int) (laserNorm.x + laserOrigin.x),
+			if (level.collision((int) (laserNorm.x + laserOrigin.x),
 					(int) (laserNorm.y + laserOrigin.y))){
 				laserEnd = laserNorm.get();
 				laserEnd.add(laserOrigin);

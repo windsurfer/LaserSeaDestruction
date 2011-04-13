@@ -82,6 +82,8 @@ public class LSDTileMap extends LSDSprite {
 		_tileHeight = 16;
 		_tileWidth = 16;
 		
+		fixed = true;
+		
 		_block = new LSDSprite();
 	}
 	
@@ -235,19 +237,24 @@ public class LSDTileMap extends LSDSprite {
 		_frames[Index] = _data.get(Index);
 	}
 	
-	
+	@Override
 	public ArrayList<Rectangle> getHulls(LSDSprite sprite){
+		//PApplet.println("Tilemap! ");
 		//TODO: cache this somehow
 		if (sprite == null){
-			hulls.clear();
-			hulls.add(new Rectangle(0,0,w,h));
-		    return hulls;
+			PApplet.println("I got a null sprite given to me for collisions");
+			return super.getHulls(sprite);
+		}
+		if (sprite instanceof LSDContainer){
+			sprite = new LSDSprite();
+			sprite.w = this.w;
+			sprite.h = this.h;
 		}
 		hulls.clear();
-		int spriteTileX = (int) Math.floor((sprite.pos.x - this.pos.x)/_tileWidth);
-		int spriteTileY = (int) Math.floor((sprite.pos.y - this.pos.y)/_tileHeight);
-		int spriteTileWidth = spriteTileX + (int) Math.ceil(sprite.w/_tileWidth)+1;
-		int spriteTileHeight = spriteTileY + (int) Math.ceil(sprite.h/_tileHeight)+1;
+		int spriteTileX = (int) Math.floor((sprite.pos.x - sprite.w/2.0f - this.pos.x)/(float)_tileWidth);
+		int spriteTileY = (int) Math.floor((sprite.pos.y - sprite.h/2.0f - this.pos.y)/(float)_tileHeight);
+		int spriteTileWidth = spriteTileX + (int) Math.ceil(sprite.w/(float)_tileWidth)+2; //TODO: Change this to 1
+		int spriteTileHeight = spriteTileY + (int) Math.ceil(sprite.h/(float)_tileHeight)+2; // TODO: Change this to 1
 		
 		if(spriteTileX < 0){
 			spriteTileX = 0;
@@ -262,56 +269,60 @@ public class LSDTileMap extends LSDSprite {
 			spriteTileHeight = heightInTiles;
 		}
 		int rs = spriteTileY*widthInTiles;
-		for(int r = spriteTileY; r < spriteTileHeight; r++){
-			for(int c = spriteTileX; c < spriteTileWidth; c++){
-				if(_data.get(rs+c) >= collideIndex){
-					hulls.add(new Rectangle(pos.x+c*_tileWidth, pos.y+r*_tileHeight, this.w, this.h));
+		for(int ry = spriteTileY; ry < spriteTileHeight; ry++){
+			for(int cx = spriteTileX; cx < spriteTileWidth; cx++){
+				if(_data.get(rs+cx) >= collideIndex){
+					hulls.add(new Rectangle(pos.x+cx*_tileWidth, pos.y+ry*_tileHeight, this._tileWidth, this._tileHeight));
 				}
 			}
 			rs += widthInTiles;
 		}
-		
+
+		//PApplet.println("tilewidth! " + _tileWidth);
 		return hulls;
 	}
 	
 	protected void renderTilemap() {
-		
-		PVector _point = new PVector();
-		getScreenXY(_point);
-		PVector _flashPoint = new PVector();
-		_flashPoint.x = _point.x;
-		_flashPoint.y = _point.y;
-		
-		int tx = (int) Math.floor(-_flashPoint.x / _tileWidth);
-		int ty = (int) Math.floor(-_flashPoint.y / _tileHeight);
-		if (tx < 0)
-			tx = 0;
-		if (tx > widthInTiles - _screenCols)
-			tx = widthInTiles - _screenCols;
-		if (ty < 0)
-			ty = 0;
-		if (ty > heightInTiles - _screenRows)
-			ty = heightInTiles - _screenRows;
-		int ri = ty * widthInTiles + tx;
-		_flashPoint.x += tx * _tileWidth;
-		_flashPoint.y += ty * _tileHeight;
-		int opx = (int) _flashPoint.x;
-		int c;
-		int cri;
-		for (int r = 0; r < _screenRows; r++){
-			cri = ri;
-			for (c = 0; c < _screenCols; c++){
-				int i = _frames[cri];
-				if (_flashPoint != null){
-					LSDG.theParent.image(frames.get(i), _flashPoint.x, _flashPoint.y);
+		LSDG.theParent.pushMatrix();
+			
+			LSDG.theParent.imageMode(PApplet.CENTER);
+			PVector _point = new PVector();
+			getScreenXY(_point);
+			PVector _flashPoint = new PVector();
+			_flashPoint.x = _point.x;
+			_flashPoint.y = _point.y;
+			
+			int tx = (int) Math.floor(-_flashPoint.x / _tileWidth);
+			int ty = (int) Math.floor(-_flashPoint.y / _tileHeight);
+			if (tx < 0)
+				tx = 0;
+			if (tx > widthInTiles - _screenCols)
+				tx = widthInTiles - _screenCols;
+			if (ty < 0)
+				ty = 0;
+			if (ty > heightInTiles - _screenRows)
+				ty = heightInTiles - _screenRows;
+			int ri = ty * widthInTiles + tx;
+			_flashPoint.x += tx * _tileWidth;
+			_flashPoint.y += ty * _tileHeight;
+			int opx = (int) _flashPoint.x;
+			int c;
+			int cri;
+			for (int r = 0; r < _screenRows; r++){
+				cri = ri;
+				for (c = 0; c < _screenCols; c++){
+					int i = _frames[cri];
+					if (_flashPoint != null){
+						LSDG.theParent.image(frames.get(i), _flashPoint.x, _flashPoint.y);
+					}
+					_flashPoint.x += _tileWidth;
+					cri++;
 				}
-				_flashPoint.x += _tileWidth;
-				cri++;
+				ri += widthInTiles;
+				_flashPoint.x = opx;
+				_flashPoint.y += _tileHeight;
 			}
-			ri += widthInTiles;
-			_flashPoint.x = opx;
-			_flashPoint.y += _tileHeight;
-		}
+		LSDG.theParent.popMatrix();
 	}
 	
 	 /**
@@ -376,20 +387,66 @@ public class LSDTileMap extends LSDSprite {
 		renderTilemap();
 	}
 	
+	@Override
 	public void run() {
 		super.run();
 	}
 	
+	 /**
+	* Called by <code>FlxObject.updateMotion()</code> and some constructors to
+	* rebuild the basic collision data for this object.
+	*/
+	@Override 
+	public void refreshHulls(){
+		colHullX.pos.x = 0;
+		colHullX.pos.y = 0;
+		colHullX.w = _tileWidth;
+		colHullX.h = _tileHeight;
+		colHullY.pos.x = 0;
+		colHullY.pos.y = 0;
+		colHullY.w = _tileWidth;
+		colHullY.h = _tileHeight;
+	}
+	
+	@Override
 	public void draw() {
-		LSDG.theParent.translate(pos.x, pos.y);
-		LSDG.theParent.imageMode(PApplet.CENTER);
-		if (frames != null){
-			if (flip){
-				LSDG.theParent.scale(-1.0f, 1.0f);
+		LSDG.theParent.pushMatrix();
+			LSDG.theParent.translate(pos.x, pos.y);
+			if (frames != null){
+				if (flip){
+					LSDG.theParent.scale(-1.0f, 1.0f);
+				}
+				if (this.scale - LSDG.roundingError < 1.0f || this.scale -+LSDG.roundingError > 1.0f ){
+					LSDG.theParent.scale(this.scale, this.scale);
+				}
+				render();
 			}
-			LSDG.theParent.scale(this.scale, this.scale);
-			render();
-		}
+		LSDG.theParent.popMatrix();
+	}
+	
+	@Override
+	public void collide(LSDSprite s, LSDSprite a){
+		// we don't care about collisions
+	}
+	
+	@Override
+	public void hitLeft(LSDSprite Contact,float Velocity)	{
 		
 	}
+	
+	@Override
+	public void hitRight(LSDSprite Contact,float Velocity)	{
+		
+	}
+	
+	@Override
+	public void hitTop(LSDSprite Contact,float Velocity){
+		
+	}
+	
+	@Override
+	public void hitBottom(LSDSprite Contact,float Velocity){
+		
+	}
+	
 }
