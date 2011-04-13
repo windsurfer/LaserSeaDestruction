@@ -68,7 +68,11 @@ class Player extends LSDSprite{
       shotTimer-=LSDG.frameTime();
     }
     
-    
+    if(LSDG.keys(CONTROL)){
+      println("Sulu, prepare for warp manoeuvres!");
+      pos.x = random(0,width);
+      pos.y = random(0,height);
+    }
   }
   
 }
