@@ -89,9 +89,9 @@ public class Platformer extends LSDGame {
 	public void run(){
 		super.run();
 		if (LSDG.collide(player, level1.collisionMap)){
-			LSDG.theParent.background(255,0,0);
+			//LSDG.theParent.background(255,0,0);
 		}else{
-			LSDG.theParent.background(0,0,255);
+			//LSDG.theParent.background(0,0,255);
 		}
 		LSDG.collide(player, platform);
 		if (player.pos.y > LSDG.theParent.height){

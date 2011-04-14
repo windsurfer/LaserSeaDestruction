@@ -230,8 +230,8 @@ public class LSDG {
 		if(!match){
 			quadTree.add(Object2,QuadTree.B_LIST);
 		}
-		boolean cx = quadTree.overlap(!match, false);
 		boolean cy = quadTree.overlap(!match, true);
+		boolean cx = quadTree.overlap(!match, false);
 		return cx || cy;
 	}
 	
@@ -270,12 +270,12 @@ public class LSDG {
 		//Offset loop variables
 		int i1;
 		int i2;
-		Rectangle obj1Hull = Object1.colHullX.get();
-		Rectangle obj2Hull = Object2.colHullX.get();
+		Rectangle obj1Hull = Object1.colHullX;
+		Rectangle obj2Hull = Object2.colHullX;
 		//ArrayList co1 = Object1.colOffsets;
 		//ArrayList co2 = Object2.colOffsets;
-		ArrayList<Rectangle> co1 = Object1.getHulls(Object2); //get the hulls that are relevant to object2
-		ArrayList<Rectangle> co2 = Object2.getHulls(Object1);
+		ArrayList<Rectangle> co1 = Object1.getHulls(Object2.colHullX); //get the hulls that are relevant to object2
+		ArrayList<Rectangle> co2 = Object2.getHulls(Object1.colHullX);
 		int l1 = co1.size();
 		int l2 = co2.size();
 		float ox1;
@@ -317,8 +317,8 @@ public class LSDG {
 				oy2 = co2.get(i2).pos.y;
 				obj2Hull.pos.x += ox2;
 				obj2Hull.pos.y += oy2;
-				//obj2Hull.w = co2.get(i2).w;
-				//obj2Hull.h = co2.get(i2).h;
+				obj2Hull.w = co2.get(i2).w;
+				obj2Hull.h = co2.get(i2).h;
 				
 				if(LSDG.showHulls){
 					LSDG.theParent.pushMatrix();
@@ -328,11 +328,12 @@ public class LSDG {
 					LSDG.theParent.popMatrix();
 				}
 				//See if it's a actually a valid collision
-				if 		  ((obj1Hull.pos.x + obj1Hull.w/2.0f < obj2Hull.pos.x - obj2Hull.w/2.0f + roundingError)
-						|| (obj1Hull.pos.x - obj1Hull.w/2.0f + roundingError > obj2Hull.pos.x + obj2Hull.w/2.0f)
-						|| (obj1Hull.pos.y + obj1Hull.h/2.0f < obj2Hull.pos.y - obj2Hull.h/2.0f + roundingError)
-						|| (obj1Hull.pos.y - obj1Hull.h/2.0f + roundingError > obj2Hull.pos.y + obj2Hull.h/2.0f)){
-					
+				// divide by 2 here... because it works. Don't question it.
+				 if( (obj1Hull.pos.x + obj1Hull.w < obj2Hull.pos.x + roundingError) ||
+						 (obj1Hull.pos.x + roundingError > obj2Hull.pos.x + obj2Hull.w) ||
+						 (obj1Hull.pos.y + obj1Hull.h/2.0f < obj2Hull.pos.y + roundingError) ||
+						 (obj1Hull.pos.y + roundingError > obj2Hull.pos.y + obj2Hull.h/2.0f) )
+						 {
 					obj2Hull.pos.x -= ox2;
 					obj2Hull.pos.y -= oy2;
 					continue;
@@ -471,11 +472,11 @@ public class LSDG {
 		// Offset loop variables
 		int i1;
 		int i2;
-		Rectangle obj1Hull = Object1.colHullY.get();
-		Rectangle obj2Hull = Object2.colHullY.get();
+		Rectangle obj1Hull = Object1.colHullY;
+		Rectangle obj2Hull = Object2.colHullY;
 		
-		ArrayList<Rectangle> co1 = Object1.getHulls(Object2);
-		ArrayList<Rectangle> co2 = Object2.getHulls(Object1);
+		ArrayList<Rectangle> co1 = Object1.getHulls(Object2.colHullY);
+		ArrayList<Rectangle> co2 = Object2.getHulls(Object1.colHullY);
 		
 		int l1 = co1.size();
 		int l2 = co2.size();
@@ -529,11 +530,11 @@ public class LSDG {
 					LSDG.theParent.popMatrix();
 				}
 				// See if it's a actually a valid collision
-				if 		  ((obj1Hull.pos.x + obj1Hull.w/2.0f < obj2Hull.pos.x - obj2Hull.w/2.0f + roundingError)
-						|| (obj1Hull.pos.x - obj1Hull.w/2.0f + roundingError > obj2Hull.pos.x + obj2Hull.w/2.0f)
-						|| (obj1Hull.pos.y + obj1Hull.h/2.0f < obj2Hull.pos.y - obj2Hull.h/2.0f + roundingError)
-						|| (obj1Hull.pos.y - obj1Hull.h/2.0f + roundingError > obj2Hull.pos.y + obj2Hull.h/2.0f)){
-					
+				 if( (obj1Hull.pos.x + obj1Hull.w/2.0f < obj2Hull.pos.x + roundingError) ||
+						 (obj1Hull.pos.x + roundingError > obj2Hull.pos.x + obj2Hull.w/2.0f) ||
+						 (obj1Hull.pos.y + obj1Hull.h < obj2Hull.pos.y + roundingError) ||
+						 (obj1Hull.pos.y + roundingError > obj2Hull.pos.y + obj2Hull.h) )
+						 {
 					obj2Hull.pos.x -= ox2;
 					obj2Hull.pos.y -= oy2;
 					continue;
@@ -590,7 +591,6 @@ public class LSDG {
 					Object1.hitBottom(Object2, sv1);
 					Object2.hitTop(Object1, sv2);
 				}else{
-					PApplet.println("HitTop");
 					Object1.hitTop(Object2, sv1);
 					Object2.hitBottom(Object1, sv2);
 				}

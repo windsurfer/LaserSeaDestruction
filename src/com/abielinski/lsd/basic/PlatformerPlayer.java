@@ -25,9 +25,9 @@ public class PlatformerPlayer extends LSDSprite {
 	
 	public void init(){
 		this.createGraphic(16, 16, "basicPlatformerPlayer.PNG");
-		accel.y = 0.0001f;
+		accel.y = 0.001f;
 		drag.x = 0.1f;
-		//drag.y = 0.1f;
+		drag.y = 0.001f;
 	}
 	
 	public void run(){
@@ -40,12 +40,12 @@ public class PlatformerPlayer extends LSDSprite {
 			accel.x = 0;
 			vel.x = 0;
 		}
-		if (LSDG.keys(PApplet.UP) ){
+		if (LSDG.keys(PApplet.UP) && onFloor ){
 			onFloor = false;
-			vel.y = -0.1f;
+			vel.y = -0.3f;
 		}
 		if (LSDG.keys(PApplet.DOWN)){
-			onFloor = false;
+			onFloor = true;
 			vel.y = 0.1f;
 		}
 		if (pos.x < 0){pos.x = 0; vel.x = 0;}

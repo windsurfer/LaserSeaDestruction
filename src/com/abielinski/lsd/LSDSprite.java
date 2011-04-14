@@ -275,7 +275,7 @@ public class LSDSprite extends Rectangle
 		if (solid){
 			refreshHulls();
 		}
-		onFloor = false;
+		//onFloor = false;
 		
 		if (!fixed){
 			pos.x += vel.x*LSDG.frameTime();
@@ -346,7 +346,8 @@ public class LSDSprite extends Rectangle
 		colHullY.pos.y = pos.y;
 		colHullY.w = w;
 		colHullY.h = h;
-		
+		hulls.clear();
+		hulls.add(new Rectangle(0,0,w,h));
 	}
 	
 	
@@ -355,9 +356,7 @@ public class LSDSprite extends Rectangle
 	 * @param sprite The sprite that will be colliding with this sprite. Can be blank
 	 * @return All the hulls that could possible collide with sprite
 	 */
-	public ArrayList<Rectangle> getHulls(LSDSprite sprite){
-		hulls.clear();
-		hulls.add(new Rectangle(0,0,w,h));
+	public ArrayList<Rectangle> getHulls(Rectangle sprite){
 	    return hulls;
 	}
 	/**

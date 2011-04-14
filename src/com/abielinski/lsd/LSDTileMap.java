@@ -238,7 +238,7 @@ public class LSDTileMap extends LSDSprite {
 	}
 	
 	@Override
-	public ArrayList<Rectangle> getHulls(LSDSprite sprite){
+	public ArrayList<Rectangle> getHulls(Rectangle sprite){
 		//PApplet.println("Tilemap! ");
 		//TODO: cache this somehow
 		if (sprite == null){
