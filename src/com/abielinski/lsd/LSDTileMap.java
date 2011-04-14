@@ -360,7 +360,7 @@ public class LSDTileMap extends LSDSprite {
 			if(getTileByIndex(i)==Index){
 				LSDSprite newObject;
 				try{
-					newObject= (LSDSprite)Class.forName(className).newInstance();
+					newObject= (LSDSprite)Class.forName(className).newInstance(new Object[]{LSDG.theParent});
 				}catch (InstantiationException e){
 					e.printStackTrace();
 					continue;
