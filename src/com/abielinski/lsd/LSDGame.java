@@ -11,23 +11,23 @@ public class LSDGame extends LSDContainer{
 	 * The camera for this game.
 	 */
 	public LSDCamera camera;
-	  
-	  /**
+	
+	/**
 	 * Initialize the game with default logic
 	 */
 	public LSDGame(){
-	    super();
-	  }  
-	  public void init(){
-	    camera = new LSDCamera();
-	  }
-	  
-	  public void run(){
-	    super.run();
-	  }
-	  
-	  public void draw(){
-	    super.draw();
-	  }
-	  
+		super();
+	}  
+	public void init(){
+		camera = new LSDCamera();
 	}
+	
+	public void run(){
+		super.run();
+	}
+	
+	public void draw(){
+		super.draw();
+	}
+	
+}

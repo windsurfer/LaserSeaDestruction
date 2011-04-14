@@ -349,12 +349,13 @@ public class LSDTileMap extends LSDSprite {
 	}
 	
 	/**
-	 * @param Index
-	 * @param className
-	 * @return whether the 
+	 * Returns an array of sprites
+	 * @param Index which tile to replace 
+	 * @param className the exact, fully-qualified class name. MUST be an LSDSprite.
+	 * @return The array of sprites in their proper place
 	 */
-	public ArrayList<Object> replaceTilesByIndex(int Index, String className){
-		ArrayList<Object> _group = new ArrayList<Object>();
+	public ArrayList<LSDSprite> replaceTilesByIndex(int Index, String className){
+		ArrayList<LSDSprite> _group = new ArrayList<LSDSprite>();
 		for(int i = 0; i< widthInTiles*heightInTiles;i++){
 			if(getTileByIndex(i)==Index){
 				LSDSprite newObject;
@@ -374,10 +375,26 @@ public class LSDTileMap extends LSDSprite {
 					_group.add(newObject);
 					newObject.pos.x = i%widthInTiles*_tileWidth;
 					newObject.pos.y = (int)i/heightInTiles*_tileHeight;
+					_data.set(i, 0);
 				}
 			}
 		}
 		return _group;
+	}
+	
+	/**
+	 * Returns an LSDContainer instead of an array, placed at 0,0.
+	 * @param Index which tile to replace 
+	 * @param className the exact, fully-qualified class name. MUST be an LSDSprite.
+	 * @return a container filled with the specified sprite
+	 */
+	public LSDContainer getContainerFromIndexes(int Index, String className){
+		ArrayList<LSDSprite> _group  = replaceTilesByIndex(Index, className);
+		LSDContainer _container = new LSDContainer();
+		for (LSDSprite s : _group){
+			_container.add(s);
+		}
+		return _container;
 	}
 	
 	/**

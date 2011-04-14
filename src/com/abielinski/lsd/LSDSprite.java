@@ -272,8 +272,11 @@ public class LSDSprite extends Rectangle
 	 */
 	public  void run() {
 		prevPos = pos.get();
-		if (solid)
+		if (solid){
 			refreshHulls();
+		}
+		onFloor = false;
+		
 		if (!fixed){
 			pos.x += vel.x*LSDG.frameTime();
 			pos.y += vel.y*LSDG.frameTime();
@@ -287,10 +290,8 @@ public class LSDSprite extends Rectangle
 			vel.y /= (drag.y*LSDG.frameTime()+1);
 			
 
-			diffVector.x = vel.x - diffVector.x;
-			diffVector.x /= 2.0;
-			diffVector.y = vel.y - diffVector.y;
-			diffVector.y /= 2.0;
+			diffVector.x = vel.x+(diffVector.x - vel.x)/2.0f;
+			diffVector.y = vel.y+(diffVector.y - vel.y)/2.0f;
 			
 		}
 		

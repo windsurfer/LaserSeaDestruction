@@ -88,7 +88,7 @@ public class QuadTree extends Rectangle {
 	 */
 	public QuadTree(float X, float Y, float Width, float Height, QuadTree Parent)
 	{
-		super(X,Y,Width,Height);
+		super(X-Width/2.0f,Y-Height/2.0f,Width,Height);
 		_parent = Parent;
 		init();
 	}
@@ -185,7 +185,7 @@ public class QuadTree extends Rectangle {
 			}
 			
 			
-		}
+		}else
 		if(Obj.solid)
 		{
 			_o = Obj;

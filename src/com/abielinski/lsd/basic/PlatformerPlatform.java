@@ -31,7 +31,8 @@ public class PlatformerPlatform extends LSDSprite {
 	public void init(){
 		this.createGraphic(256, 16, "large_block.png");
 		//fixed = true;
-		//drag.y = 0.1f;
+		drag.y = 0.1f;
+		drag.x = 0.1f;
 	}
 	@Override
 	public void collide(LSDSprite s, LSDSprite ground){

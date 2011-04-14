@@ -494,9 +494,7 @@ public class LSDG {
 				(obj1MovePos && obj2MovePos && (((o1 > 0) ? o1 : -o1) > ((o2 > 0) ? o2 : -o2)))); // both moving down, obj1 overtakes obj2
 		
 
-		if (!p1hn2){
-			PApplet.println("omg");
-		}
+		
 		// this looks insane, but we're just looping through collision rectangles
 		// on each object
 		for (i1 = 0; i1 < l1; i1++){
@@ -589,7 +587,6 @@ public class LSDG {
 					sv2 /= 2;
 				}
 				if (p1hn2){
-					PApplet.println("HitBottom");
 					Object1.hitBottom(Object2, sv1);
 					Object2.hitTop(Object1, sv2);
 				}else{
