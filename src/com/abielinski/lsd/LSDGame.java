@@ -13,10 +13,16 @@ public class LSDGame extends LSDContainer{
 	public LSDCamera camera;
 	
 	/**
+	 * The scaling of the game
+	 */
+	public float scale;
+	
+	/**
 	 * Initialize the game with default logic
 	 */
 	public LSDGame(){
 		super();
+		scale = 1.0f;
 	}  
 	public void init(){
 		camera = new LSDCamera();
@@ -27,7 +33,12 @@ public class LSDGame extends LSDContainer{
 	}
 	
 	public void draw(){
-		super.draw();
+		LSDG.theParent.pushMatrix();
+			if (scale - LSDG.roundingError > 1.0 || scale + LSDG.roundingError < 1.0){
+				LSDG.theParent.scale(scale);
+			}
+			super.draw();
+		LSDG.theParent.popMatrix();
 	}
 	
 }

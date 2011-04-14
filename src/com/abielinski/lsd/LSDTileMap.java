@@ -1,6 +1,8 @@
 package com.abielinski.lsd;
 
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import com.abielinski.lsd.util.Rectangle;
@@ -354,28 +356,61 @@ public class LSDTileMap extends LSDSprite {
 	 * @param className the exact, fully-qualified class name. MUST be an LSDSprite.
 	 * @return The array of sprites in their proper place
 	 */
+	@SuppressWarnings("unchecked")
 	public ArrayList<LSDSprite> replaceTilesByIndex(int Index, String className){
 		ArrayList<LSDSprite> _group = new ArrayList<LSDSprite>();
+		Class<LSDSprite> c;
+		try{
+			c = (Class<LSDSprite>) Class.forName(className);
+		}catch (ClassNotFoundException e){
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return _group;
+		}
+		if (c == null){
+			return _group;
+		}
 		for(int i = 0; i< widthInTiles*heightInTiles;i++){
 			if(getTileByIndex(i)==Index){
 				LSDSprite newObject;
+				@SuppressWarnings("rawtypes")
+				Constructor con;
 				try{
-					newObject= (LSDSprite)Class.forName(className).newInstance(new Object[]{LSDG.theParent});
+					con = c.getDeclaredConstructor(new Class[] { LSDG.theParent.getClass() });
+				}catch (SecurityException e){
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					continue;
+				}catch (NoSuchMethodException e){
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					continue;
+				}
+				try{
+					newObject= (LSDSprite)con.newInstance(new Object[] { LSDG.theParent });;
 				}catch (InstantiationException e){
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 					continue;
 				}catch (IllegalAccessException e){
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 					continue;
-				}catch (ClassNotFoundException e){
+				}catch (IllegalArgumentException e){
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					continue;
+				}catch (InvocationTargetException e){
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 					continue;
 				}
 				if(newObject != null){
 					_group.add(newObject);
 					newObject.pos.x = i%widthInTiles*_tileWidth;
-					newObject.pos.y = (int)i/heightInTiles*_tileHeight;
+					newObject.pos.y = (float) (Math.floor((float)i/(float)widthInTiles)*_tileHeight);
 					_data.set(i, 0);
+					updateTile(i);
 				}
 			}
 		}
