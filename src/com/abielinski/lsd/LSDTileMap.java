@@ -255,8 +255,8 @@ public class LSDTileMap extends LSDSprite {
 		hulls.clear();
 		int spriteTileX = (int) Math.floor((sprite.pos.x - sprite.w/2.0f - this.pos.x)/(float)_tileWidth);
 		int spriteTileY = (int) Math.floor((sprite.pos.y - sprite.h/2.0f - this.pos.y)/(float)_tileHeight);
-		int spriteTileWidth = spriteTileX + (int) Math.ceil(sprite.w/(float)_tileWidth)+2; //TODO: Change this to 1
-		int spriteTileHeight = spriteTileY + (int) Math.ceil(sprite.h/(float)_tileHeight)+2; // TODO: Change this to 1
+		int spriteTileWidth = spriteTileX + (int) Math.ceil(sprite.w/(float)_tileWidth)+3; //TODO: Change this to 1
+		int spriteTileHeight = spriteTileY + (int) Math.ceil(sprite.h/(float)_tileHeight)+3; // TODO: Change this to 1
 		
 		if(spriteTileX < 0){
 			spriteTileX = 0;
@@ -274,7 +274,8 @@ public class LSDTileMap extends LSDSprite {
 		for(int ry = spriteTileY; ry < spriteTileHeight; ry++){
 			for(int cx = spriteTileX; cx < spriteTileWidth; cx++){
 				if(_data.get(rs+cx) >= collideIndex){
-					hulls.add(new Rectangle(pos.x+cx*_tileWidth, pos.y+ry*_tileHeight, this._tileWidth, this._tileHeight));
+					hulls.add(new Rectangle(pos.x+cx*_tileWidth, 
+											pos.y+ry*_tileHeight, this._tileWidth, this._tileHeight));
 				}
 			}
 			rs += widthInTiles;

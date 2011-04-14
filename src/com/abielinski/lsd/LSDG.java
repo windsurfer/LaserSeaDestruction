@@ -49,7 +49,7 @@ public class LSDG {
 	/**
 	 * The maximum allowed difference between two floats to be considered "equal"
 	 */
-	public static final float							roundingError	= 0.000001f;
+	public static final float							roundingError	= 0.1f;
 	
 	/**
 	 * A collection of pre-parsed images. Used to speed up image loading.
@@ -306,7 +306,7 @@ public class LSDG {
 			if(LSDG.showHulls){
 				LSDG.theParent.pushMatrix();
 					//LSDG.theParent.rectMode(PApplet.CENTER);
-					LSDG.theParent.fill(255,60,60,160);
+					LSDG.theParent.fill(60,60,255,160);
 					LSDG.theParent.rect(obj1Hull.pos.x, obj1Hull.pos.y, obj1Hull.w, obj1Hull.h);
 				LSDG.theParent.popMatrix();
 			}

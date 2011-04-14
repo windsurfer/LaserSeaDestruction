@@ -51,6 +51,11 @@ public class LSDSprite extends Rectangle
 	public Rectangle colHullY;
 	
 	/**
+	 * Offset of all collision calculations
+	 */
+	public PVector colOffset;
+	
+	/**
 	 * I'm not really sure how colHullX is better than this
 	 */
 	ArrayList<Rectangle> hulls;
@@ -181,6 +186,7 @@ public class LSDSprite extends Rectangle
 		life = 1;
 		colHullX = new Rectangle();
 		colHullY = new Rectangle();
+		colOffset = new PVector();
 		hulls = new ArrayList<Rectangle>();
 	}
 	
@@ -298,7 +304,7 @@ public class LSDSprite extends Rectangle
 		colHullX.w += ((diffVector.x > 0) ? diffVector.x : -diffVector.x);
 		if (diffVector.x < 0)
 			colHullX.pos.x += diffVector.x;
-		colHullY.pos.x = pos.x;
+		colHullY.pos.x = pos.x+colOffset.x;
 		
 		colHullY.h += ((diffVector.y > 0) ? diffVector.y : -diffVector.y);
 		if (diffVector.y < 0)
@@ -338,12 +344,12 @@ public class LSDSprite extends Rectangle
 	 * Refreshes the hulls used for physics calculations based on the sprite as it was loaded.
 	 */
 	public void refreshHulls(){
-		colHullX.pos.x = pos.x;
-		colHullX.pos.y = pos.y;
+		colHullX.pos.x = pos.x+colOffset.x;
+		colHullX.pos.y = pos.y-h/2.0f+colOffset.y;
 		colHullX.w = w;
 		colHullX.h = h;
-		colHullY.pos.x = pos.x;
-		colHullY.pos.y = pos.y;
+		colHullY.pos.x = pos.x+colOffset.x;
+		colHullY.pos.y = pos.y-h/2.0f+colOffset.y;;
 		colHullY.w = w;
 		colHullY.h = h;
 		hulls.clear();

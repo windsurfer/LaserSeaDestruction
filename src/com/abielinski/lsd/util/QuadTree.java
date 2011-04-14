@@ -424,6 +424,12 @@ public class QuadTree extends Rectangle {
 						(_o.pos.y + _o.h < co.pos.y + LSDG.roundingError) ||
 						(_o.pos.y + LSDG.roundingError > co.pos.y + co.h) )
 				{
+//				if( (_o == co) ||  !co.solid || !_o.solid ||
+//						(_o.pos.x + _o.w/2.0f  < co.pos.x - co.w/2.0f + LSDG.roundingError) ||
+//						(_o.pos.x - _o.w/2.0f + LSDG.roundingError > co.pos.x + co.w/2.0f) ||
+//						(_o.pos.y + _o.h/2.0f  < co.pos.y - co.h/2.0f + LSDG.roundingError) ||
+//						(_o.pos.y - _o.h/2.0f + LSDG.roundingError > co.pos.y + co.h/2.0f) )
+//				{
 					itr = itr.next;
 					continue;
 				}
