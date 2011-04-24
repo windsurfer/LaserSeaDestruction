@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="F:/software/PortableGit-1.7.3.1-preview20101002/projects/tw-repo1/physics_test/code/LSD.jar"/>
+    <jar path="H:/software/PortableGit-1.7.3.1-preview20101002/projects/tw-repo1/Final Game/Game_Server/code/LSD.jar"/>
     <options buildIfNeeded="true" compress="false" descriptionLocation="/LaserSeaDestruction/default_jar.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>

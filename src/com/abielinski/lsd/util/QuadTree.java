@@ -320,7 +320,7 @@ public class QuadTree extends Rectangle {
 	 *
 	 * @return	Whether or not any overlaps were found.
 	 */
-	public Boolean overlap(boolean BothLists, boolean yCollision) 
+	public Boolean overlap(boolean BothLists, int yCollision) 
 	{
 		Boolean c = false;
 		LSDList itr;
@@ -397,7 +397,7 @@ public class QuadTree extends Rectangle {
 	 * 
 	 * @return	Whether or not any overlaps were found.
 	 */
-	protected Boolean overlapNode(LSDList Iterator,boolean yCollision) 
+	protected Boolean overlapNode(LSDList Iterator,int yCollision) 
 	{
 		//member list setup
 		Boolean c = false;
@@ -435,10 +435,10 @@ public class QuadTree extends Rectangle {
 				}
 				co.collide(co, _o);
 				_o.collide(_o, co);
-				if (yCollision){
+				if (yCollision == 0){
 					if(LSDG.solveYCollision(_o,co))
 						c = true;
-				}else{
+				}else if (yCollision == 1){
 					if(LSDG.solveXCollision(_o,co))
 						c = true;
 				}

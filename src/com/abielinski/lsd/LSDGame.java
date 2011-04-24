@@ -29,7 +29,12 @@ public class LSDGame extends LSDContainer{
 	}
 	
 	public void run(){
-		super.run();
+		LSDG.theParent.pushMatrix();
+			if (scale - LSDG.roundingError > 1.0 || scale + LSDG.roundingError < 1.0){
+				LSDG.theParent.scale(scale);
+			}
+			super.run();
+		LSDG.theParent.popMatrix();
 	}
 	
 	public void draw(){

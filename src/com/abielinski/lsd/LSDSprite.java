@@ -284,17 +284,18 @@ public class LSDSprite extends Rectangle
 		//onFloor = false;
 		
 		if (!fixed){
+
 			pos.x += vel.x*LSDG.frameTime();
 			pos.y += vel.y*LSDG.frameTime();
-			
 
+			
 			diffVector.x = vel.x;
 			diffVector.y = vel.y;
 			vel.x+= accel.x*LSDG.frameTime();
 			vel.y+= accel.y*LSDG.frameTime();
 			vel.x /= (drag.x*LSDG.frameTime()+1);
 			vel.y /= (drag.y*LSDG.frameTime()+1);
-			
+
 
 			diffVector.x = vel.x+(diffVector.x - vel.x)/2.0f;
 			diffVector.y = vel.y+(diffVector.y - vel.y)/2.0f;
@@ -306,7 +307,7 @@ public class LSDSprite extends Rectangle
 			colHullX.pos.x += diffVector.x;
 		colHullY.pos.x = pos.x+colOffset.x;
 		
-		colHullY.h += ((diffVector.y > 0) ? diffVector.y : -diffVector.y);
+		colHullY.h += ((diffVector.y > 0) ? diffVector.y : -diffVector.y)*4;
 		if (diffVector.y < 0)
 			colHullY.pos.y += diffVector.y;
 		// you need to draw later
@@ -332,7 +333,9 @@ public class LSDSprite extends Rectangle
 					LSDG.theParent.scale(-1.0f,1.0f);
 				}
 				LSDG.theParent.scale(this.scale, this.scale);
-				LSDG.theParent.image(frames.get(curFrame()), 0,0);
+				if (frames.size()>0){
+					LSDG.theParent.image(frames.get(curFrame()), 0,0);
+				}
 			}
 		LSDG.theParent.popMatrix();
 	}

@@ -58,9 +58,28 @@ public class LSDG {
 	
 	
 	/**
-	 * Whether to (hackishly) draw the collision hulls. Will be drawn during the run() step!!
+	 * Whether to (hackishly) draw the collision hulls. Will be drawn during the run() step, 
+	 * and as a consequence, will swap the order of draw and run!
 	 */
 	public static boolean showHulls	= false;
+	
+	
+	/**
+	 * Whether we are currently animating or running physics. Internal variable.
+	 */
+	protected static boolean runningPhysics = false;
+	
+	/**
+	 * The time as it concerns physics
+	 */
+	protected static int physicsFrameTime;
+	
+	
+
+	/**
+	 * the physics step size
+	 */
+	public static int physicsStep = 10;
 	
 	/**
 	 * Initializes the library. This is required to happen before pretty much everything else.
@@ -97,6 +116,7 @@ public class LSDG {
 		long currentTime = System.currentTimeMillis();
 		currentFrameTime = currentTime - lastFrame;
 		lastFrame = currentTime;
+		physicsFrameTime = (int)currentFrameTime; // temporary!
 		if (showHulls){
 			// if we're drawing hulls, run after drawing!
 			LSDG.draw();
@@ -112,9 +132,15 @@ public class LSDG {
 	 * This is called by update() automatically. Runs the logic for your game.
 	 */
 	public static void run() {
+		runningPhysics = true;
 		if (game != null){
-			game.run();
+			int remaining = (int)currentFrameTime;
+			physicsFrameTime = physicsStep;
+			for (int i = 0; i < remaining; i+=physicsStep){
+				game.run();
+			}
 		}
+		runningPhysics = false;
 	}
 	
 	/**
@@ -130,6 +156,9 @@ public class LSDG {
 	 * @return the current frame time.
 	 */
 	public static int frameTime() {
+		if(runningPhysics){
+			return physicsFrameTime;
+		}
 		return (int) currentFrameTime;
 	}
 	
@@ -209,15 +238,15 @@ public class LSDG {
 	}
 	
 	/**
-	 * Call this function to see if one <code>FlxObject</code> collides with another.
+	 * Call this function to see if one <code>LSDSprite</code> collides with another.
 	 * Can be called with one object and one group, or two groups, or two objects,
 	 * whatever floats your boat! It will put everything into a quad tree and then
 	 * check for collisions. For maximum performance try bundling a lot of objects
-	 * together using a <code>FlxGroup</code> (even bundling groups together!)
+	 * together using a <code>LSDCollection</code> (even bundling groups together!)
 	 * NOTE: does NOT take objects' scrollfactor into account.
 	 *
 	 * @param Object1 The first object or group you want to check.
-	 * @param Object2 The second object or group you want to check. If it is the same as the first, flixel knows to just do a comparison within that group.
+	 * @param Object2 The second object or group you want to check. If it is the same as the first, LSD knows to just do a comparison within that group.
 	 * @return whether they collide
 	 */
 	static public boolean collide(LSDSprite Object1,LSDSprite Object2){
@@ -230,11 +259,34 @@ public class LSDG {
 		if(!match){
 			quadTree.add(Object2,QuadTree.B_LIST);
 		}
-		boolean cy = quadTree.overlap(!match, true);
-		boolean cx = quadTree.overlap(!match, false);
+		boolean cy = quadTree.overlap(!match, 0);
+		boolean cx = quadTree.overlap(!match, 1);
 		return cx || cy;
 	}
 	
+	/**
+	 * Call this function to see if one <code>LSDSprite</code> overlaps another.
+	 * Can be called with one object and one group, or two groups, or two objects,
+	 * whatever floats your boat! It will put everything into a quad tree and then
+	 * check for collisions. For maximum performance try bundling a lot of objects
+	 * together using a <code>LSDCollection</code> (even bundling groups together!)
+	 * NOTE: does NOT take objects' scrollfactor into account.
+	 *
+	 * @param Object1 The first object or group you want to check.
+	 * @param Object2 The second object or group you want to check. If it is the same as the first, LSD knows to just do a comparison within that group.
+	 * @return whether they collide
+	 */
+	 static public boolean overlap(LSDSprite Object1,LSDSprite Object2) {
+		 if( (Object1 == null) || (Object2 == null) ){
+			 return false;
+		 }
+		 QuadTree quadTree = new QuadTree();
+		 quadTree.add(Object1,QuadTree.A_LIST);
+		 if(Object1 == Object2)
+			 return quadTree.overlap(false,2);
+		 quadTree.add(Object2,QuadTree.B_LIST);
+		 return quadTree.overlap(true,2);
+	 }
 	
 	/**
 	 * This quad tree callback function can be used externally as well.
