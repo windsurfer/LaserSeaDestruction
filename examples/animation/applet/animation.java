@@ -1,16 +1,37 @@
+import processing.core.*; 
+import processing.xml.*; 
+
+import com.abielinski.lsd.*; 
+
+import java.applet.*; 
+import java.awt.Dimension; 
+import java.awt.Frame; 
+import java.awt.event.MouseEvent; 
+import java.awt.event.KeyEvent; 
+import java.awt.event.FocusEvent; 
+import java.awt.Image; 
+import java.io.*; 
+import java.net.*; 
+import java.text.*; 
+import java.util.*; 
+import java.util.zip.*; 
+import java.util.regex.*; 
+
+public class animation extends PApplet {
+
 /*
  * Written by Adam Bielinski
  * Hold mouse button to change animation
  * This shows off the time-based animation
  */
 
-import com.abielinski.lsd.*;
+
 
 String spriteLoc = "man1.png";
 
 LSDSprite man;
 
-void setup(){
+public void setup(){
   size(300,300);
   new LSDG(this);// init library
   man = new LSDSprite(width/2, height/2); // center it
@@ -32,7 +53,7 @@ void setup(){
   LSDG.game.add(man);
 }
 
-void draw(){
+public void draw(){
   background(0);
   if(mousePressed){
     man.flip = true;
@@ -42,4 +63,8 @@ void draw(){
     man.setAnimation("walking");
   }
   LSDG.update();
+}
+  static public void main(String args[]) {
+    PApplet.main(new String[] { "--bgcolor=#F0F0F0", "animation" });
+  }
 }

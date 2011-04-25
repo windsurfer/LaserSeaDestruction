@@ -139,6 +139,7 @@ ${line}
 		<mkdir dir="${project.tmp}/${project.name}" />
 	  	<mkdir dir="${project.tmp}/${project.name}/${folder}" />
   		<mkdir dir="${project.tmp}/${project.name}/examples" />
+		<mkdir dir="${project.tmp}/${project.name}/demos" />
 	  	<mkdir dir="${project.tmp}/${project.name}/reference" />
   		<mkdir dir="${project.tmp}/${project.name}/src" />
   		<copy todir="${project.tmp}/${project.name}/examples">
@@ -146,6 +147,11 @@ ${line}
 	  			<exclude name="**/*README*"/>
   			</fileset>
 	  	</copy>
+		<copy todir="${project.tmp}/${project.name}/demos">
+		  	<fileset dir="${project.demos}">
+			  	<exclude name="**/*README*"/>
+		  	</fileset>
+		</copy>
   		<copy todir="${project.tmp}/${project.name}/src">
   			<fileset dir="${project.src}"/>
 	  	</copy>
@@ -205,6 +211,10 @@ ${line}
   			<fileset dir="${project.dist.version}/${project.name}/examples" />
 	  	</copy>
 	  	
+		<copy todir="${project.dist.version}/web/demos">
+  			<fileset dir="${project.dist.version}/${project.name}/demos" />
+	  	</copy>
+		
 	  	<copy todir="${project.dist.version}/web">
   			<fileset dir="${project.web}" />
 	  	</copy>
@@ -288,6 +298,12 @@ ${line}
   	  							match="##project.examples##"
   	  	  						replace=""
   	  	  						flags="g" />
+		<antcall target="processDemos" />
+		
+		<replaceregexp file="${project.dist.version}/web/index.html"
+		  	  							match="##project.demos##"
+		  	  	  						replace=""
+		  	  	  						flags="g" />
 	</target>
 	
 	
@@ -361,7 +377,7 @@ ${line}
 		<echo message="adding example ${demosDir}" />
 		<replaceregexp file="${project.dist.version}/web/index.html"
 	  				match="(##project.demos##)"
-	  	  			replace="&lt;li&gt;&lt;a href=&quot;demos/${demosDir}/${demosDir}.pde&quot;&gt;${demosDir}&lt;/a&gt;&lt;/li&gt; \1"
+	  	  			replace="&lt;li&gt;&lt;a href=&quot;demos/${demosDir}/index.html&quot;&gt;${demosDir}&lt;/a&gt;&lt;/li&gt; \1"
 	  	  			flags="g" />
 	</target>
 	
