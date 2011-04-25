@@ -1,3 +1,24 @@
+import processing.core.*; 
+import processing.xml.*; 
+
+import com.abielinski.lsd.*; 
+
+import java.applet.*; 
+import java.awt.Dimension; 
+import java.awt.Frame; 
+import java.awt.event.MouseEvent; 
+import java.awt.event.KeyEvent; 
+import java.awt.event.FocusEvent; 
+import java.awt.Image; 
+import java.io.*; 
+import java.net.*; 
+import java.text.*; 
+import java.util.*; 
+import java.util.zip.*; 
+import java.util.regex.*; 
+
+public class Asteroids extends PApplet {
+
 /**
  * Written by Nik, Debugged by Adam
  * 
@@ -6,7 +27,7 @@
  */
 
 
-import com.abielinski.lsd.*;
+
 
 Player ship;
 LSDContainer rocks;
@@ -14,10 +35,10 @@ LSDG lsd;
 Rock rock;
 
 
-float bulletSpeed = 0.4;
+float bulletSpeed = 0.4f;
 LSDContainer bullets;
 
-void setup() {
+public void setup() {
   size(600, 400);
   smooth();
   // init the library (required)
@@ -50,7 +71,7 @@ void setup() {
   LSDG.game.add(bullets);
 }
 
-void draw() {
+public void draw() {
   background(0);
 
   // this is where the actual game happens!
@@ -58,14 +79,14 @@ void draw() {
 }
 
 public class AsteroidsGame extends LSDGame {
-  void update(){
+  public void update(){
     LSDG.collide(bullets, rocks);
     LSDG.collide(ship, rocks);
   }
 }
 
 // fires a bullet from the specified position in the specified direction
-void fireBullet(PVector _pos, PVector _dir) {
+public void fireBullet(PVector _pos, PVector _dir) {
   PVector direction = _dir.get();
   direction.normalize();
   direction.mult(bulletSpeed);
@@ -81,22 +102,22 @@ class Bullet extends LSDSprite {
     init();
   }
 
-  void init() {
+  public void init() {
     this.createGraphic(12, 12, "bullet.png");
-    life = 600.0;
+    life = 600.0f;
   }
-  void update(){
+  public void update(){
     life-=LSDG.frameTime();
     if (life <=0) {
       bullets.remove(this);
     }
   }
 
-  void kill() {
-    life = -1.0;
+  public void kill() {
+    life = -1.0f;
   }
 
-  void collide(LSDSprite me, LSDSprite anything) {
+  public void collide(LSDSprite me, LSDSprite anything) {
     this.kill(); // kill me :(
   }
 }
@@ -105,8 +126,8 @@ class Player extends LSDSprite {
 
 
   // some "constants" that affect how we control the ship
-  float thrust = 0.0005;
-  float rotation = 0.005;
+  float thrust = 0.0005f;
+  float rotation = 0.005f;
 
 
   float shotTimer;
@@ -116,7 +137,7 @@ class Player extends LSDSprite {
     init();
   }
 
-  void init() {
+  public void init() {
     this.createGraphic(25, 25, "ship.png");
 
 
@@ -125,12 +146,12 @@ class Player extends LSDSprite {
     this.addAnimation("moving", 12, 1, 2);
     setAnimation("idle");
 
-    drag.x = 0.001;
-    drag.y = 0.001;
-    shotTimer = 0.0;
+    drag.x = 0.001f;
+    drag.y = 0.001f;
+    shotTimer = 0.0f;
   }
 
-  void update(){
+  public void update(){
     // makes this object loop around the screen
     if (pos.y > height)pos.y = 0; 
     if (pos.y < 0)pos.y = height; 
@@ -144,11 +165,11 @@ class Player extends LSDSprite {
       angle += rotation*LSDG.frameTime();
     }
     if (LSDG.keys(UP)) {
-      bumpAtAngle(thrust, -PI/2.0);
+      bumpAtAngle(thrust, -PI/2.0f);
       setAnimation("moving");
     }
     else if (LSDG.keys(DOWN)) {
-      bumpAtAngle(thrust, PI/2.0);
+      bumpAtAngle(thrust, PI/2.0f);
     }
     else {
       setAnimation("idle");
@@ -157,8 +178,8 @@ class Player extends LSDSprite {
     if (LSDG.keys(' ') && shotTimer <= 0) {
 
       fireBullet(pos, 
-      new PVector(cos(angle-PI/2.0), sin(angle-PI/2.0)));
-      shotTimer = 150.0;
+      new PVector(cos(angle-PI/2.0f), sin(angle-PI/2.0f)));
+      shotTimer = 150.0f;
     }
     else if (shotTimer >0) {
       shotTimer-=LSDG.frameTime();
@@ -166,7 +187,7 @@ class Player extends LSDSprite {
 
     if (LSDG.keys(CONTROL)) {
       // super boost ;)
-      bumpAtAngle(thrust*10, -PI/2.0);
+      bumpAtAngle(thrust*10, -PI/2.0f);
     }
   }
 }
@@ -178,21 +199,21 @@ class Rock extends LSDSprite {
     init();
   }
 
-  void init() {
+  public void init() {
     this.createGraphic(50, 50, "rock.png");
 
-    vel.x = random(-0.014, 0.014);
-    vel.y = random(-0.014, 0.014);
+    vel.x = random(-0.014f, 0.014f);
+    vel.y = random(-0.014f, 0.014f);
   }
 
-  void update(){
+  public void update(){
     if (pos.y > height)pos.y = 0; 
     if (pos.y < 0)pos.y = height; 
     if (pos.x < 0)pos.x = width;
     if (pos.x > width)pos.x = 0;
   } 
   public void collide(LSDSprite me, LSDSprite anything) {
-    if (scale >0.25) {
+    if (scale >0.25f) {
       Rock newRock = new Rock(this.pos.x, this.pos.y);
       newRock.scale = this.scale/2.0f;
       newRock.w = this.w/2.0f;
@@ -203,3 +224,7 @@ class Rock extends LSDSprite {
   }
 }
 
+  static public void main(String args[]) {
+    PApplet.main(new String[] { "--bgcolor=#F0F0F0", "Asteroids" });
+  }
+}

@@ -418,18 +418,33 @@ public class QuadTree extends Rectangle {
 			while(itr != null)
 			{
 				co = itr.object;
-				if( (_o == co) ||  !co.solid || !_o.solid ||
-						(_o.pos.x + _o.w  < co.pos.x + LSDG.roundingError) ||
-						(_o.pos.x + LSDG.roundingError > co.pos.x + co.w) ||
-						(_o.pos.y + _o.h < co.pos.y + LSDG.roundingError) ||
-						(_o.pos.y + LSDG.roundingError > co.pos.y + co.h) )
-				{
+				
+				if(LSDG.showHulls && LSDG.debug){
+					LSDG.theParent.pushMatrix();
+						//LSDG.theParent.rectMode(PApplet.CENTER);
+						LSDG.theParent.fill(60,255,60,160);
+						LSDG.theParent.rect(_o.pos.x-_o.w/2.0f, _o.pos.y-_o.h/2.0f, _o.w, _o.h);
+					LSDG.theParent.popMatrix();
+					LSDG.theParent.pushMatrix();
+						//LSDG.theParent.rectMode(PApplet.CENTER);
+						LSDG.theParent.fill(60,255,255,160);
+						LSDG.theParent.rect(co.pos.x-co.w/2.0f, co.pos.y-co.h/2.0f, co.w, co.h);
+					LSDG.theParent.popMatrix();
+				}
+				
 //				if( (_o == co) ||  !co.solid || !_o.solid ||
-//						(_o.pos.x + _o.w/2.0f  < co.pos.x - co.w/2.0f + LSDG.roundingError) ||
-//						(_o.pos.x - _o.w/2.0f + LSDG.roundingError > co.pos.x + co.w/2.0f) ||
-//						(_o.pos.y + _o.h/2.0f  < co.pos.y - co.h/2.0f + LSDG.roundingError) ||
-//						(_o.pos.y - _o.h/2.0f + LSDG.roundingError > co.pos.y + co.h/2.0f) )
+//						(_o.pos.x + _o.w  < co.pos.x + LSDG.roundingError) ||
+//						(_o.pos.x + LSDG.roundingError > co.pos.x + co.w) ||
+//						(_o.pos.y + _o.h < co.pos.y + LSDG.roundingError) ||
+//						(_o.pos.y + LSDG.roundingError > co.pos.y + co.h) )
 //				{
+// 				old flixel collisions...
+				if( (_o == co) ||  !co.solid || !_o.solid ||
+						(_o.pos.x + _o.w/2.0f  < co.pos.x - co.w/2.0f + LSDG.roundingError) ||
+						(_o.pos.x - _o.w/2.0f + LSDG.roundingError > co.pos.x + co.w/2.0f) ||
+						(_o.pos.y + _o.h/2.0f  < co.pos.y - co.h/2.0f + LSDG.roundingError) ||
+						(_o.pos.y - _o.h/2.0f + LSDG.roundingError > co.pos.y + co.h/2.0f) )
+				{
 					itr = itr.next;
 					continue;
 				}

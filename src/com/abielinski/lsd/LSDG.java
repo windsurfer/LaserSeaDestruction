@@ -4,6 +4,7 @@ package com.abielinski.lsd;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.abielinski.lsd.util.KeyHandler;
 import com.abielinski.lsd.util.QuadTree;
 import com.abielinski.lsd.util.Rectangle;
 
@@ -22,7 +23,7 @@ public class LSDG {
 	/**
 	 * The reference to your currently running game mode.
 	 */
-	public static LSDGame								game;
+	public static LSDGame								game = new LSDGame();
 	
 	/**
 	 * The time at which the last frame was rendered. Used for phyiscs and animation.
@@ -42,7 +43,7 @@ public class LSDG {
 	/**
 	 * An internal collection of currently pressed keys. Used for keeping track of all keyboard stuff.
 	 */
-	public static HashMap<Object, Boolean>				keys;
+	public static HashMap<Object, Boolean>				keys = new HashMap<Object, Boolean>();
 	
 	// some helper values
 	
@@ -69,10 +70,18 @@ public class LSDG {
 	 */
 	protected static boolean runningPhysics = false;
 	
+	protected static long currentTime;
+	
 	/**
 	 * The time as it concerns physics
 	 */
 	protected static int physicsFrameTime;
+	
+	
+	protected static int physicsRemainingFrameTime = 0;
+	
+	
+	protected static final KeyHandler keyHandler = new KeyHandler();
 	
 	
 
@@ -80,6 +89,11 @@ public class LSDG {
 	 * the physics step size
 	 */
 	public static int physicsStep = 10;
+
+	/**
+	 * Whether we're in debug mode or not
+	 */
+	public static boolean	debug = false;
 	
 	/**
 	 * Initializes the library. This is required to happen before pretty much everything else.
@@ -106,17 +120,23 @@ public class LSDG {
 		currentFrameTime = 0;
 		keys = new HashMap<Object, Boolean>();
 		cachedFrames = new HashMap<String, ArrayList<PImage>>();
-		// game.init();
+		game.init();
+		theParent.registerKeyEvent(keyHandler);
 	}
 	
 	/**
 	 * Call this every frame. It runs the game!
+	 * It will trick the <code>run()</code> functions of every object to operate on a fixed-time,
+	 * but animation will only occur once per frame.
 	 */
 	public static void update() {
-		long currentTime = System.currentTimeMillis();
+		currentTime = System.currentTimeMillis();
 		currentFrameTime = currentTime - lastFrame;
 		lastFrame = currentTime;
 		physicsFrameTime = (int)currentFrameTime; // temporary!
+		
+		// deal with keyboard stuff
+		
 		if (showHulls){
 			// if we're drawing hulls, run after drawing!
 			LSDG.draw();
@@ -135,8 +155,12 @@ public class LSDG {
 		runningPhysics = true;
 		if (game != null){
 			int remaining = (int)currentFrameTime;
+			physicsRemainingFrameTime+= remaining;
+			// this is used to trick the frameTime getter
 			physicsFrameTime = physicsStep;
-			for (int i = 0; i < remaining; i+=physicsStep){
+			
+			while(physicsRemainingFrameTime > remaining){
+				physicsRemainingFrameTime-=physicsStep;
 				game.run();
 			}
 		}

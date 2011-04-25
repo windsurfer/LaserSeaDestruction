@@ -1,6 +1,7 @@
 package com.abielinski.lsd;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import com.abielinski.lsd.util.CollisionCallback;
@@ -218,10 +219,10 @@ public class LSDSprite extends Rectangle
 		}
 	}
 	/**
-	 * Adds a new animation sequence named name and also sets the current animation to it if nothing is playing.
+	 * Adds a new animation sequence named <code>name</code> and also sets the current animation to it if nothing is playing.
 	 * @param name The name of the new animation
 	 * @param fRate The framerate of the animation in frames per second (fps)
-	 * @param frames The frames of the animation in the form of an ArrayList of integers.
+	 * @param frames The frames of the animation in the form of an <code>ArrayList</code> of integers.
 	 */
 	public void addAnimation(String name,float fRate,ArrayList<Integer> frames) {
 		if(frames == null || name == null|| animations == null){
@@ -238,6 +239,18 @@ public class LSDSprite extends Rectangle
 		}else{
 			PApplet.print("Animation wasn't null,weird.\n");
 		}
+	}
+	
+	
+	
+	/**
+	 * Adds a new animation sequence named name and also sets the current animation to it if nothing is playing.
+	 * @param name The name of the new animation
+	 * @param fRate The framerate of the animation in frames per second (fps)
+	 * @param frames The frames of the animation in the form of an array of integers.
+	 */
+	public void addAnimation(String name,float fRate,Integer... frames) {
+		addAnimation(name, fRate, new ArrayList<Integer>(Arrays.asList(frames)));
 	}
 	
 	/**
@@ -274,7 +287,7 @@ public class LSDSprite extends Rectangle
 	
 	/**
 	 * This function is intended to be called every frame before the draw() function. It calculates physics and sets up any 
-	 * animations.
+	 * animations. If you want to override it, make sure to use super()!
 	 */
 	public  void run() {
 		prevPos = pos.get();
@@ -317,7 +330,13 @@ public class LSDSprite extends Rectangle
 			curAnimationTime = 0;
 			newAnimation= curAnimation;
 		}
+		update();
 	}
+	/**
+	 * This gets called every physics cycle. By default it does nothing.
+	 */
+	public void update() {	}
+
 	/**
 	 * This function draws the Sprite to the default buffer.
 	 */
@@ -574,8 +593,10 @@ public class LSDSprite extends Rectangle
 	 */
 	@Override
 	public void collide(LSDSprite obj1, LSDSprite obj2) {
-		PApplet.println("I've detected a collision, but I haven't done anything about it.");
-		PApplet.println("in " + this.getClass().getName() );
+		if (LSDG.debug){
+			PApplet.println("I've detected a collision, but I haven't done anything about it.");
+			PApplet.println("in " + this.getClass().getName() );
+		}
 		
 	}
 

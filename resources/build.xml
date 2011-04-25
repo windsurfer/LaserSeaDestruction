@@ -38,6 +38,7 @@
 	<property name="project.bin" location="bin"/>
 	<property name="project.bin.data" location="${project.bin}/data"/>
 	<property name="project.examples" location="examples"/>
+	<property name="project.demos" location="demos"/>
 	<property name="project.reference" location="reference"/>
 	<property name="project.dist" location="distribution"/>
 	<property name="project.dist.version" location="distribution/${project.name}-${project.version}"/>
@@ -347,7 +348,22 @@ ${line}
 	  	  			flags="g" />
 	</target>
 	
-	
+	<!-- parsing the demo folder -->
+	<target name="processDemos">
+		<dirset id="demos.contents" dir="${project.demos}" excludes="*/*"/>
+		<property name="demos.list" refid="demos.contents"/>
+		<foreach list="${demos.list}" target="addDemos" param="demosDir" delimiter=";">
+		</foreach>
+	</target>
+		
+		
+	<target name="addDemos">
+		<echo message="adding example ${demosDir}" />
+		<replaceregexp file="${project.dist.version}/web/index.html"
+	  				match="(##project.demos##)"
+	  	  			replace="&lt;li&gt;&lt;a href=&quot;demos/${demosDir}/${demosDir}.pde&quot;&gt;${demosDir}&lt;/a&gt;&lt;/li&gt; \1"
+	  	  			flags="g" />
+	</target>
 	
 	<target name="clean" depends="library.run">
 		<!-- <delete dir="${project.bin}"/> -->

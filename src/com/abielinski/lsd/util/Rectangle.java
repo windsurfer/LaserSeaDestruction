@@ -68,4 +68,26 @@ public class Rectangle {
 		// TODO Auto-generated method stub
 		return new Rectangle(this.pos.x, this.pos.y, this.w, this.h);
 	}
+	
+	/**
+	 * @param _x 
+	 * @param _y 
+	 * @param _w 
+	 * @param _h 
+	 * @return A copy of a rectange using CORNER coordinates from a CENTERed system
+	 */
+	public Rectangle fromCenter(float _x, float _y, float _w, float _h){
+		return new Rectangle(_x-_w/2.0f, _y-_h/2.0f, _w, _h);
+	}
+	
+	/**
+	 * @param _x 
+	 * @param _y 
+	 * @param _w 
+	 * @param _h 
+	 * @return A copy of a rectange using CENTER coordinates from a CORNERed system
+	 */
+	public Rectangle fromCorner(float _x, float _y, float _w, float _h){
+		return new Rectangle(_x+_w/2.0f, _y+_h/2.0f, _w, _h);
+	}
 }
